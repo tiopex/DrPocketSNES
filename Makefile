@@ -59,29 +59,16 @@ wiz_common: MNAME = wiz
 wiz_common: COPT += -mcpu=arm926ej-s -mtune=arm926ej-s -g -D__PANDORA__
 #wiz_common: COPT += -D__FAST_OBJS__
 wiz_common: COPT += -O3
-#wiz_common: COPT += -Os 
-#wiz_common: COPT += -static -ffast-math -msoft-float
 wiz_common: COPT += -finline-limit=42 -fno-unroll-loops -fno-ipa-cp -ffast-math
 wiz_common: COPT += -fno-common -fno-stack-protector -fno-guess-branch-probability -fno-caller-saves -fno-regmove 
-#wiz_common: COPT += -finline -finline-functions -fexpensive-optimizations 
-#wiz_common: COPT += -falign-functions=32 -falign-loops -falign-labels -falign-jumps
-#wiz_common: COPT += -fomit-frame-pointer 
-#wiz_common: COPT += -fno-common -fno-builtin -fstrict-aliasing -mstructure-size-boundary=32 
-# -fweb -frename-registers 
-# -fsplit-ivs-in-unroller
-#wiz_common: COPT += -Wall -Wno-sign-compare -Wunused -Wpointer-arith -Wcast-align -Waggregate-return 
 wiz_common: OBJS = pandora_sdk.o
 wiz_common: OBJS += os9x_65c816_global.o os9x_65c816_spcasm.o os9x_65c816_spcc.o os9x_asm_cpu.o
-wiz_common: ARCH = $(CROSS)
-wiz_common: SDK = $(SDKC)
-#/$(ARCH)
-#wiz_common: ARCH = arm-openwiz-linux-gnu
-#wiz_common: SDK = /opt/openwiz/toolchain/$(ARCH)
+wiz_common: ARCH = $(CROSS_COMPILE)
+wiz_common: SDK = $(CROSS_ROOT)/usr
 wiz_common: do
 
 # -- Fast version
 wizf: VNAME = $(NFAST)
-#wizf: COPT = -DASMCPU -D__DEBUG__
 wizf: COPT = -DASMCPU -DDEBUG
 wizf: wiz_common
 
@@ -98,14 +85,13 @@ wiz:
 else
 
 TOOLS = $(SDK)/bin
-GCC = $(TOOLS)/$(ARCH)-gcc
-STRIP = $(TOOLS)/$(ARCH)-strip
-ADSASM = $(TOOLS)/$(ARCH)-as
-LIBS = -I$(SDK)/include -I$(INCLUDE2) -I$(INCLUDE) -I$(INCLUDE)/SDL 
-INCS = -I$(INCLUDE2)
+GCC = $(TOOLS)/$(ARCH)gcc
+STRIP = $(TOOLS)/$(ARCH)strip
+ADSASM = $(TOOLS)/$(ARCH)as
+LIBS = -I$(SDK)/include 
 ODIR = $(VNAME)_$(ODIR_SUFFIX)
 # Inopia's menu system, hacked for the GP2X under rlyeh's sdk
-PRELIBS = -I$(INCLUDE2) -I$(INCLUDE) -I$(INCLUDE)/SDL -lpthread -lz $(LIBS)
+PRELIBS = -lpthread -lz $(LIBS)
 
 #
 # SNES stuff (c-based)
@@ -141,10 +127,10 @@ OBJS += disk_img.o
 #
 OBJS += main.o
 FOBJS = $(addprefix $(ODIR)/,$(OBJS))
-COPT += $(INCS) $(LIBS) -I$(INCLUDE2) -I$(INCLUDE) -I$(INCLUDE)/SDL 
+COPT += $(INCS) $(LIBS)
 
 executable: $(FOBJS)
-	$(GCC) $(COPT) -I$(INCLUDE2) -I$(INCLUDE) -I$(INCLUDE)/SDL $(FOBJS) -o $(PNAME)_$(VNAME)_d -lSDL -lasound -lstdc++ -lz -lpthread
+	$(GCC) $(COPT) $(FOBJS) -o $(PNAME)_$(VNAME)_d -lSDL -lasound -lstdc++ -lz -lpthread
 	$(STRIP) $(PNAME)_$(VNAME)_d -o $(PNAME)_$(VNAME)
 
 $(FOBJS): | $(ODIR)
