@@ -30,8 +30,6 @@
 #define Weight3_1(A, B)   (Half(A) + Quarter(A) + Quarter(B) + Corr3_1(A, B))
 #define Weight1_1(A, B)   (Half(A) + Half(B) + Corr1_1(A, B))
 
-#define SOUND_OUTPUT_FREQUENCY 22050
-#define SOUND_SAMPLES_SIZE 1024
 static snd_pcm_t *handle;
 
 volatile unsigned short  gp2x_palette[512][2];
@@ -60,6 +58,7 @@ volatile int CurrentSoundBank=0;
 int CurrentFrameBuffer=0;
 int CurrentFrag=0;
 unsigned int ExistingIntHandler;
+snd_pcm_uframes_t samples=0;
 
 extern unsigned short * pOutputScreen;
 
@@ -446,7 +445,13 @@ static
 void *gp2x_sound_play(void)
 {
 
-	return NULL;
+	while(! gp2x_sound_thread_exit)
+	{
+		Timer++;
+		CurrentSoundBank++;
+		if (CurrentSoundBank >= 8) CurrentSoundBank = 0;
+        snd_pcm_writei(handle, (void *)pOutput[CurrentSoundBank], samples);
+	}
 }
 
 void gp2x_sound_play_bank(int bank)
@@ -475,19 +480,19 @@ unsigned long gp_timer_read(void)
   return (tval.tv_sec*1000000)+tval.tv_usec;
 }
 
-int gp_initSound(int rate, int bits, int stereo, int Hz, int frag)
+int gp_initSound(int rate, int bits, int stereo, int Hz, int frag, int hiMode)
 {
 	int status;
 	int i=0;
 	int nonblocking=1;
-	unsigned int bufferStart=0;
+	unsigned int bufferStart=0, period_time;
 	int result;
 	char text[256];
 
 	snd_pcm_hw_params_t *params;
 	uint32_t val;
-	int32_t dir = -1;
-	snd_pcm_uframes_t frames;
+	int32_t dir = 0;
+
 	
 	/* Open PCM device for playback. */
 	int32_t rc = snd_pcm_open(&handle, "default", SND_PCM_STREAM_PLAYBACK, 0);
@@ -549,7 +554,7 @@ int gp_initSound(int rate, int bits, int stereo, int Hz, int frag)
 		return 1;
 	}
 	
-	val = SOUND_OUTPUT_FREQUENCY;
+	val = rate;
 	rc = snd_pcm_hw_params_set_rate_near(handle, params, &val, &dir);
 	if (rc < 0)
 	{
@@ -558,21 +563,34 @@ int gp_initSound(int rate, int bits, int stereo, int Hz, int frag)
 	}
 
 	/* Set period size to settings.aica.BufferSize frames. */
-	frames = SOUND_SAMPLES_SIZE;
-	rc = snd_pcm_hw_params_set_period_size_near(handle, params, &frames, &dir);
+	if (hiMode) {
+	    samples = val / 100 *2 + 1;
+	    period_time = 20000;
+	} else
+	{
+	    samples = val / 100 *2 + 1 - 74;
+	    period_time = 16643;
+	}
+	rc = snd_pcm_hw_params_set_period_size_near(handle, params, &samples, NULL);
 	if (rc < 0)
 	{
 		fprintf(stderr, "Error:snd_pcm_hw_params_set_buffer_size_near %s\n", snd_strerror(rc));
 		return 1;
 	}
-	frames *= 4;
-	rc = snd_pcm_hw_params_set_buffer_size_near(handle, params, &frames);
+	snd_pcm_uframes_t buf_size = samples*4;
+	rc = snd_pcm_hw_params_set_buffer_size_near(handle, params, &buf_size);
 	if (rc < 0)
 	{
 		fprintf(stderr, "Error:snd_pcm_hw_params_set_buffer_size_near %s\n", snd_strerror(rc));
 		return 1;
 	}
-
+	rc = snd_pcm_hw_params_set_period_time_near(handle, params, &period_time, 0);
+	if (rc < 0)
+	{
+		fprintf(stderr, "Error:snd_pcm_hw_params_set_period_time_near %s\n", snd_strerror(rc));
+		return 1;
+	}
+    printf("Actual Audio Freq %d Period %d bufsize %d period_time %d hiMode %d\n",rate, samples, buf_size, period_time, hiMode);
 	/* Write the parameters to the driver */
 	rc = snd_pcm_hw_params(handle, params);
 	if (rc < 0)
@@ -594,6 +612,11 @@ int gp_initSound(int rate, int bits, int stereo, int Hz, int frag)
 	pOutput[5] = (short*)bufferStart+(5*gp2x_sound_buffer[1]);
 	pOutput[6] = (short*)bufferStart+(6*gp2x_sound_buffer[1]);
 	pOutput[7] = (short*)bufferStart+(7*gp2x_sound_buffer[1]);
+
+	if(!gp2x_sound_thread)
+	{
+		pthread_create( &gp2x_sound_thread, NULL, gp2x_sound_play, NULL);
+	}
 
 	for(i=0;i<(gp2x_sound_buffer[1]*8);i++)
 	{
