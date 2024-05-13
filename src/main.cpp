@@ -1525,7 +1525,7 @@ int main(int argc, char *argv[])
 				samplecount=Settings.SoundPlaybackRate/frame_limit;
 				if (Settings.Stereo)
 					samplecount = samplecount * 2;
-				gp_initSound(Settings.SoundPlaybackRate,16,Settings.Stereo,frame_limit,0x0002000F);
+				gp_initSound(Settings.SoundPlaybackRate,16,Settings.Stereo,frame_limit,0x0002000F, Memory.HiROM);
 				so.stereo = Settings.Stereo;
 				so.playback_rate = Settings.SoundPlaybackRate;
 				S9xSetPlaybackRate(so.playback_rate);
@@ -1552,7 +1552,6 @@ int main(int argc, char *argv[])
 							// should never happen but I'm seeing problems where the FPS stops updating
 							tick=Timer; // start timeing again, maybe Timer value has wrapped around?
 						}
-						
 						aim=SegAim();
 						if (done!=aim)
 						{
@@ -1621,7 +1620,7 @@ int main(int argc, char *argv[])
 					}
 #if defined (__GP2X__) || defined(__WIZ__) || defined(__PANDORA__) || defined(__MIYOO__)
 					done=aim; // Make sure up to date
-#endif					
+#endif
 					// need some way to exit menu
 					if (enterMenu)
 						break;
