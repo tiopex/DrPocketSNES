@@ -61,6 +61,8 @@ wiz_common: COPT += -mcpu=arm926ej-s -mtune=arm926ej-s -g -D__MIYOO__
 wiz_common: COPT += -O3
 wiz_common: COPT += -finline-limit=42 -fno-unroll-loops -fno-ipa-cp -ffast-math
 wiz_common: COPT += -fno-common -fno-stack-protector -fno-guess-branch-probability -fno-caller-saves -fno-regmove 
+# Use "Delayed Raster FX" if enabled
+wiz_common: COPT += -D__OLD_RASTER_FX__
 # Miyoo obj
 wiz_common: OBJS = miyoo_sdk.o
 wiz_common: OBJS += os9x_65c816_global.o os9x_65c816_spcasm.o os9x_65c816_spcc.o os9x_asm_cpu.o
