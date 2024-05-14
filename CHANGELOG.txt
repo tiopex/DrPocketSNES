@@ -1,0 +1,215 @@
+==============
+Change History
+==============
+
+Version 7.2.1 v2 for PocketGo Release Date 13/12/2020  
+___________________________________
+Changes by Bitrider  
+Tons of help from A600 
+Graphics by XiM
+
+One of the big changes in 7.2 (from 7.1) is a hack called "Delayed Raster FX". It's active by default.
+SNES9x updated screen on every change that affect it (colors, sprites position, graphic mode, ...) it causes some slow down due to cache misses.
+Activating "Delayed Raster FX" screen will be update just once per frame, storing every change and applying it at the end of the frame.
+
+On the original machine (Wiz and Caanoo) it would give about 80-100% extra fps due to those machines arch (arm 926, 16 bit bus). 
+On PocketGo it gives a nice boost but not so big (same arm 926 but faster memory, wider bus -32 bit- ).  
+
+This hack can cause some glitches (wrong colors, graphics errors), if you find any undesirable glitch deactivate it (you will loose some fps). 
+
+PocketGo release has been possible due to big help provided by A600: setting up QEMU emulator, tool chaind and sample code.
+
+Version 7.2.1 Release Date ??/??/2020  
+___________________________________
+
+????
+___________________________________
+Version 7.1.0	Release Date 14/02/2011
+___________________________________
+Changes by Bitrider  
+Graphics by XiM
+
+- Added: Screenshots on ROM selection screen (.PNG format).
+- Added: PNG support.
+- Added: Intro by XiM.
+- Added: New graphics to the menu by XiM.
+- Added: lots of optimizations in graphics. Speed improvements.
+- Fixed: several bugs, increased stability.
+- Fixed: slowdown after a few minutes playing. (os asked to asign maximum priority to the emu)
+
+___________________________________
+Version 7.1.0	Release Date 28/10/2010
+___________________________________
+Changes by Bitrider  
+	
+- Added: Tv-Out compatiblity. 
+	Thanks to XiM for the Ext connector used to make my Tv-Out cable, which made this feature possible.
+- Internal changes: 
+	Lots of code refactoring, make my life easier. 
+	A new saner Makefile.
+
+___________________________________
+Version 7.0.1	Release Date ??/09/2010
+___________________________________
+Changes by Bitrider  
+	
+- Bug-fix release (Mode-7, priorities, sprites, etc)
+
+___________________________________
+Version 7.0.0	Release Date 30/07/2010
+___________________________________
+Changes by Bitrider  
+
+	Thanks goes to: 
+		Buba-ho-tep, Rivroner (beta testers) 
+		Anarchy (GP32Spain webmaster & conding contest promoter)
+		Head-On-Heels (v 6.5.0 developer)
+		Notaz, Squidge, Little Johnz & all those who contributed to this wonderful emulator.
+
+- Added: deep changes to SPC 700 assembly core, now it is faster.
+	- moved a few registers 
+	- less reads/writes to memory
+	- implemented GetByteZ, GetByte, SetByteZ & SetByte in ARM assembly
+- Added: modifications to 65c816 assembly core, a little bit faster.
+	- moved several flags from memory to status register.
+	- implemented SetPCBase in ARM assembly.
+	- SetDSP & GetDSP called directly (S9x_SetDSP & S9x_GetDSP where just wrapper functions with no added value).
+	- Assembly CPU code splitted in several files (modularity purposes)
+- Added: 4 different assembly APU (SPC 700) cycle sizes: 13, 14, 15 & 21. 
+	Now more games are compatible with fast executable & fast mode on compatible executable : 
+	Human's ones (Firemen, ...), Secret of evermore, Clock Tower (yeah, I know it's also by Human but a special case) that one is for you Buba. 
+- Added: 16 bit fast assembly renderers for:
+	tile: opaque, add, add 1/2, add fix 1/2, sub, sub 1/2, sub fix 1/2
+	tile clipped: opaque, add, add 1/2, add fix 1/2, sub, sub 1/2, sub fix 1/2
+	mode 7 just one layer: solid, solid with priority, add, add 1/2, sub, sub 1/2
+	mode 7 with priorities (two layers): solid, add, add 1/2, sub, sub 1/2.
+	subscreen filling: solid, add, add 1/2, sub, sub 1/2
+- Added: SpeedHacks (rom patching with snesadvance.dat) to fast executable
+- Added: a switch to enable/disable speed hacks, "Apply snesadvance.dat on ROM load".
+- Added: Super FX emulation to fast executable version.
+- Added: last played ROM loading at PocketSNES startup 
+- Added: a switch to enable/disable last played ROM loading at startup
+- Added: persistent selector in ROM list selector 
+	 Last selected ROM will continue being focused when you launch a ROM 
+	 and go back to the menu to select another ROM. (idea by Buba-ho-tep, thanks man.)
+	 It does work only when you are in default PocketSNES ROM directory
+- Added: display ROM file name while loading.
+- Added: on ROM load error display error, pause & show "Push a button to continue".
+- Added: fast version (65c816 assembly emulation) will show as "v 7.0.0 fast"
+	 compatible version (65c816 C emulation) will show as "v 7.0.0 compatible" 
+- Added: the ability to use Fast (assembly SPC-700) or Compatible (C SPC-700), more games playable on fast executable.
+	 - So "Emulation (Reset Required): Compatible/Fast" switch is now available on fast executable. 
+- Fixed: Auto save SRAM should only save when a change occurred
+- Added: "Manual + indicator" to SRAM saving options
+	 A disk will be displayed on the lower right corner of the screen when SRAM data is awaiting 
+	 Note: disk won't be visible if screen is resized
+- Added: a little bit optimized sound block decode routine.
+
+ 
+___________________________________
+Version 6.5.0	Release Date 24/10/2009
+___________________________________
+Changes by HeadOverHeels  
+	1. Optimizations in mode 7 and other code optimizations
+	2. Horizontal scaler
+	
+	FAST VERSION
+	------------
+	3. Increased compatibility: star ocean, rendering ranger, etc.
+	4. More games are compatible with audio performance hack
+	
+	NORMAL VERSION
+	--------------
+	5. Full SuperFX and SA-1 emulation
+	6. Snesadvance.dat speedhacks support
+	7. 2 sound emulation modes: compatible and fast
+
+___________________________________
+Version 6.4.5	Release Date 06/06/2009
+___________________________________
+Changes by HeadOverHeels  
+	1. Ported to GP2X WIZ
+	2. Optimizations in C4 emulation
+
+___________________________________
+Version 6.4.4	Release Date 16/11/2008
+___________________________________
+Changes by Reesy  
+	1. Zipped save states
+	2. Rom Browser code tidied, you can now set the default directory
+		from inside the rom browser.  The rom browser now also tells
+		you the current directory.
+Changes by HeadOverHeels  
+	1. Fixed some bugs in layer priority (super ghouls'n ghosts level 4 for example)
+	2. Optimizations in tile rendering code, ppu emulation, ...
+	3. Changes in volume control to be more usable with headphones in firmware 4.0.0 and louder with firmware 4.1.1
+	4. Fixed: some games do not work if you don't restart the emulator
+	5. Menu now sets cpu clock to 66 mhz to save battery
+
+___________________________________
+Version 6.4.3	Release Date 23/02/2008
+___________________________________
+Changes by HeadOverHeels  
+	1. USB pads support
+	2. Fixed sky colour for Super Mario World when transparencies are not active.
+	3. Fixed framerate for PAL games (50 fps) and added an option to configure region (AUTO, NTSC, PAL)
+	4. Fixed sound problems with some games (Ilussion of Gaia for exmaple)
+	5. Sound frequencies have been changed (8250,16500) to make GP2X F200 compatible
+	6. 256x240 games resolution problem have been fixed
+	7. C4 chip support (Megaman X2, X3)
+	8. High resolution text support (Seiken Densetsu 3 - Secret of Mana2)
+	9. Added DSP optimizations from snes9xTYL of Yoyofr.
+	10. F200 sound level now is lower
+	11. SDD1 support (Star Ocean & Street Fighter Alpha 2)
+		SDD1 decompressed packs are supported. SDD1GFX.DAT & SDD1GFX.IDX must be copied to a subdirectory named socnsdd1 (for Star Ocean) and sfa2sdd1 (for Street Fighter 2 alpha). Create these subdirectories in the roms directory.
+		If no packs are found, the emulator uses realtime decompression (slower)
+	12. Other minor fixes and optimizations.
+	13. Added stereo sound.
+	14. New advanced hacks options:
+		Audio performance hack
+		Ignore palette writes
+		Ignore Fixed Colour
+		Ignore Windows clipping
+		Ignore Add/Sub modes
+		Layer desactivation
+
+Changes by Reesy  
+___________________________________
+Version 6	Release Date 04/02/2007
+___________________________________
+	1. Fixed a bug on the rom browsing code.  Strings were not being terminated correctly.  
+___________________________________
+Version 5	Release Date 03/02/2007
+___________________________________
+	1. Changed the way SRAM works.  The old versions of PocketSnes used a timer to check if SRAM had changed while the SNES emulator was running.  If a change was detected the SRAM was saved straight away.  This used to cause glitches in the framerate.  SRAM is now saved when you enter the menu as long as you have SRAM saving set to automatic in the options menu.
+	2. Added options to allow you to switch MMU hack on or off
+	3. Added options to allow you to switch Craigx's RAM settings on or off.
+	4. Fixed problems where data was not being saved to SD card correctly, I was missing a few calls to sync()
+	5. I've tidied up the installation directory abit.  Most things used to be stored in the options sub directory and somethings were saved to the root installation directory, which was a bit of a mess.  So I've now created the following 3 directories in order to make things more logical.
+	
+	options (*.opt)		- used to hold global and individual game settings
+	savestate (*.sv*) 	- used to hold save states for all games
+	sram (*.srm)		- used to hold SRAM saves for all games
+	
+	This means that we you upgrade from Version 4 to Version 5 you will need to manually copy the savestates out of the options directory and into the savestate directory in order for PocketSnes to recognise them.  You will also have to move the SRAM files out of the root installation directory and into the sram directory.	
+___________________________________	
+Version 4	Release Date 30/01/2007
+___________________________________
+	1. Fixed timer code which was causing the emulator to crash
+___________________________________	
+Version 3	Release Date 24/01/2007
+___________________________________
+	1. Scaled display mode added.
+	2. 44K sound mode added.
+	3. Super FX support added - very very buggy and slow
+___________________________________
+Version 2	Release Date 24/01/2007
+___________________________________
+	1. Fixed Diagnals.
+	2. Fixed Volume controls.
+	3. Fixed Reset game function.
+	4. Snes Select button now working.
+___________________________________	
+Version 1	Release Date 24/01/2007
+___________________________________
+	Initial release
