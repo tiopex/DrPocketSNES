@@ -88,6 +88,7 @@ TOOLS = $(SDK)/bin
 GCC = $(TOOLS)/$(ARCH)gcc
 STRIP = $(TOOLS)/$(ARCH)strip
 ADSASM = $(TOOLS)/$(ARCH)as
+CFLAGS = -Isrc
 LIBS = -I$(SDK)/include 
 ODIR = $(VNAME)_$(ODIR_SUFFIX)
 # Inopia's menu system, hacked for the GP2X under rlyeh's sdk
@@ -127,7 +128,7 @@ OBJS += disk_img.o
 #
 OBJS += main.o
 FOBJS = $(addprefix $(ODIR)/,$(OBJS))
-COPT += $(INCS) $(LIBS)
+COPT += $(CFLAGS) $(INCS) $(LIBS)
 
 executable: $(FOBJS)
 	$(GCC) $(COPT) $(FOBJS) -o $(PNAME)_$(VNAME)_d -lSDL -lasound -lstdc++ -lz -lpthread
@@ -142,16 +143,16 @@ tidy:
 	rm $(ODIR)/*.o
 
 # -- Compilation rules
-$(ODIR)/%.o: %.cpp 
+$(ODIR)/%.o: src/%.cpp 
 	$(GCC) $(COPT) -c $< -o $@
 
-$(ODIR)/%.o: %.c 
+$(ODIR)/%.o: src/%.c 
 	$(GCC) $(COPT) -c $< -o $@
 
-$(ODIR)/%.o: %.s 
+$(ODIR)/%.o: src/%.s 
 	$(GCC) $(COPT) -c $< -o $@
 
-$(ODIR)/%.o: %.S
+$(ODIR)/%.o: src/%.S
 	$(GCC) $(COPT) -c $< -o $@
 
 endif
