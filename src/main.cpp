@@ -41,6 +41,12 @@ unsigned short *pOutputScreen;
 #include "pandora_sdk.h"
 #endif
 
+#ifdef __MIYOO__
+#include <unistd.h>
+#define TIMER_1_SECOND	1000000
+#include "miyoo_sdk.h"
+#endif
+
 #include "menu.h"
 #include "snes9x.h"
 #include "memmap.h"
@@ -517,7 +523,7 @@ extern "C"
    }
 #endif
 
-#if defined(__WIZ__)  || defined(__PANDORA__)
+#if defined(__WIZ__)  || defined(__PANDORA__) || defined(__MIYOO__)
    uint32 S9xReadJoypad (int which1)
    {
 		uint32 val=0x80000000;
@@ -838,7 +844,7 @@ static int SegAim()
 }
 #endif
 
-#if defined(__GP2X__) || defined(__WIZ__) || defined(__PANDORA__)
+#if defined(__GP2X__) || defined(__WIZ__) || defined(__PANDORA__) || defined(__MIYOO__)
 static int SegAim()
 {
   int aim=CurrentSoundBank; 
@@ -1318,7 +1324,7 @@ int main(int argc, char *argv[])
 	//initScreenShots();
 
 	GFX.Screen = (uint8 *) framebuffer16[currFB];
-#if defined(__WIZ__) || defined(__GP2X__) || defined(__PANDORA__)
+#if defined(__WIZ__) || defined(__GP2X__) || defined(__PANDORA__) || defined(__MIYOO__)
 	GFX.SubScreen = (uint8 *)malloc(GFX_PITCH * 240 * 2);
 	GFX.ZBuffer =  (uint8 *)malloc(0x13000*2);
 	GFX.SubZBuffer = GFX.ZBuffer + ZDELTA;
@@ -1419,7 +1425,9 @@ int main(int argc, char *argv[])
 			}
 #endif
 			// any change in configuration?
+#ifndef __MIYOO__
 			gp_setCpuspeed(cpuSpeedLookup[snesMenuOptions.cpuSpeed]);
+#endif
 			gp_clearFramebuffer16(framebuffer16[0], tBackgroundColor);
 			gp_clearFramebuffer16(framebuffer16[1], tBackgroundColor);
 			gp_clearFramebuffer16(framebuffer16[2], tBackgroundColor);
@@ -1521,7 +1529,7 @@ int main(int argc, char *argv[])
 				so.playback_rate = Settings.SoundPlaybackRate;
 				S9xSetPlaybackRate(so.playback_rate);
 				S9xSetSoundMute (FALSE);
-#if defined(__GP2X__) || defined(__WIZ__) || defined(__PANDORA__)
+#if defined(__GP2X__) || defined(__WIZ__) || defined(__PANDORA__) || defined(__MIYOO__)
 				SoundThreadFlag = SOUND_THREAD_SOUND_ON;
 #endif
 				gp_sound_volume(snesMenuOptions.volume,snesMenuOptions.volume);
@@ -1551,7 +1559,7 @@ int main(int argc, char *argv[])
 #ifdef __GIZ__
 							soundbuffer=(uint8 *)FrameworkAudio_GetAudioBank(done);
 #endif
-#if defined(__GP2X__) || defined(__WIZ__) || defined(__PANDORA__)
+#if defined(__GP2X__) || defined(__WIZ__) || defined(__PANDORA__) || defined(__MIYOO__)
 							soundbuffer=(uint8 *)pOutput[done];
 #endif
 							done++; if (done>=8) done=0;
@@ -1582,7 +1590,7 @@ int main(int argc, char *argv[])
 								}
 	
 #endif
-#if defined(__GP2X__) || defined(__WIZ__) || defined(__PANDORA__)
+#if defined(__GP2X__) || defined(__WIZ__) || defined(__PANDORA__) || defined(__MIYOO__)
 								if ((done==aim)) 
 								{
 									IPPU.RenderThisFrame=TRUE; // Render last frame
@@ -1610,7 +1618,7 @@ int main(int argc, char *argv[])
 						}
 						if (done==aim) break; // Up to date now
 					}
-#if defined (__GP2X__) || defined(__WIZ__) || defined(__PANDORA__)
+#if defined (__GP2X__) || defined(__WIZ__) || defined(__PANDORA__) || defined(__MIYOO__)
 					done=aim; // Make sure up to date
 #endif					
 					// need some way to exit menu
@@ -1703,7 +1711,7 @@ int main(int argc, char *argv[])
 
 	free(GFX.SubScreen); 
 	free(GFX.ZBuffer);
-#if !defined(__WIZ__) && !defined(__GP2X__) && !defined(__PANDORA__)
+#if !defined(__WIZ__) && !defined(__GP2X__) && !defined(__PANDORA__) && !defined(__MIYOO__)
 	free(GFX.SubZBuffer);
 #endif
  

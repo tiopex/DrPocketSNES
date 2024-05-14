@@ -27,11 +27,12 @@ extern "C" {
 			#include "wiz_sdk.h"
 		#endif
 	#endif
-
 	#ifdef __PANDORA__
 		#include "pandora_sdk.h"
 	#endif
-
+	#ifdef __MIYOO__
+		#include "miyoo_sdk.h"
+	#endif
 	#define DIR_SEP	"/"
 	#define DIR_SEP_BAD "\\"	
 	#define SYSTEM_DIR		"/mnt/sd/DrPocketSnes"
@@ -140,6 +141,10 @@ enum SNES_MENU_ENUM
 	SNES_MENU_RENDER_MODE,
 	SNES_MENU_ACTION_BUTTONS,
 #endif
+#if defined(__MIYOO__)
+	SNES_MENU_RENDER_MODE,
+	SNES_MENU_ACTION_BUTTONS,
+#endif
 	SNES_MENU_EMULATION_TYPE,
 	SNES_MENU_LOAD_ROM_ON_INIT,
 	SNES_MENU_ADVANCED_HACKS,
@@ -242,6 +247,22 @@ enum RENDER_MODE_ENUM
 #define INP_BUTTON_MENU_QUICKLOAD1		INP_BUTTON_L
 #define INP_BUTTON_MENU_QUICKLOAD2		INP_BUTTON_SELECT
 
+//Menu Text
+#define MENU_TEXT_LOAD_SAVESTATE 		"Press B to load"
+#define MENU_TEXT_OVERWRITE_SAVESTATE	"Press B to overwrite"
+#define MENU_TEXT_DELETE_SAVESTATE 		"Press B to delete"
+#define MENU_TEXT_PREVIEW_SAVESTATE 	"Press Y to preview"
+#endif
+
+#if defined(__MIYOO__)
+#define INP_BUTTON_MENU_SELECT			INP_BUTTON_B
+#define INP_BUTTON_MENU_CANCEL			INP_BUTTON_X
+#define INP_BUTTON_MENU_ENTER			INP_BUTTON_SELECT
+#define INP_BUTTON_MENU_DELETE			INP_BUTTON_SELECT
+#define INP_BUTTON_MENU_QUICKSAVE1		INP_BUTTON_R
+#define INP_BUTTON_MENU_QUICKSAVE2		INP_BUTTON_SELECT
+#define INP_BUTTON_MENU_QUICKLOAD1		INP_BUTTON_L
+#define INP_BUTTON_MENU_QUICKLOAD2		INP_BUTTON_SELECT
 
 //Menu Text
 #define MENU_TEXT_LOAD_SAVESTATE 		"Press B to load"
@@ -311,7 +332,9 @@ void PrintBar(int flip, unsigned int givenY);
 int FileScan();
 extern void loadStateFile(char *filename);
 extern int quickSavePresent;
+#ifndef __MIYOO__
 extern unsigned short cpuSpeedLookup[];
+#endif
 extern float gammaLookup[];
 
 extern char currentRomFilename[];

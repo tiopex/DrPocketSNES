@@ -1,4 +1,4 @@
-#ifdef __PANDORA__
+#if defined(__PANDORA__) || defined(__MIYOO__)
 
 #include <stdint.h>
 

@@ -25,7 +25,7 @@ char snesRomDir[MAX_PATH+1];
 
 DIRDATA dir;
 
-#if defined (__GP2X__)	|| defined(__PANDORA__)
+#if defined (__GP2X__) || defined(__PANDORA__)
 unsigned short cpuSpeedLookup[46]={ 
 					10,20, 30, 40, 50,
 					60,70, 80, 90,100,
@@ -348,7 +348,7 @@ void MenuPause()
 		}
 	}
 }
-#if defined (__GP2X__) || defined(__WIZ__) || defined(__PANDORA__)		
+#if defined (__GP2X__) || defined(__WIZ__) || defined(__PANDORA__) || defined(__MIYOO__)
 void MenuFlip()
 {
 	prevFB=currFB;
@@ -683,7 +683,7 @@ int FileScan()
 		{
 			if (de->d_name[0] != '.')
 			{
-#if defined(__GP2X__) || defined(__WIZ__) || defined(__PANDORA__)
+#if defined(__GP2X__) || defined(__WIZ__) || defined(__PANDORA__) || defined(__MIYOO__)
 				if (de->d_type == 4) // Directory
 #endif
 #ifdef __GIZ__
@@ -1627,7 +1627,7 @@ void SNESOptionsUpdateText(int menu_index)
 		case SNES_MENU_RETURN:
 			sprintf(menutext[SNES_MENU_RETURN],"Back");
 			break;
-#if defined(__GP2X__) || defined(__WIZ__) || defined(__PANDORA__)
+#if defined(__GP2X__) || defined(__WIZ__) || defined(__PANDORA__) || defined(__MIYOO__)
 		case SNES_MENU_RENDER_MODE:
 			switch(snesMenuOptions.renderMode)
 			{
@@ -1967,6 +1967,10 @@ void SNESOptionsUpdateText_All()
 	SNESOptionsUpdateText(SNES_MENU_CPUSPEED);
 	SNESOptionsUpdateText(SNES_MENU_ACTION_BUTTONS);
 #endif
+#if defined(__MIYOO__)
+	SNESOptionsUpdateText(SNES_MENU_RENDER_MODE);
+	SNESOptionsUpdateText(SNES_MENU_ACTION_BUTTONS);
+#endif
 #if defined(__GP2X__)
 	SNESOptionsUpdateText(SNES_MENU_GAMMA);
 #endif
@@ -2127,7 +2131,7 @@ int SNESOptionsMenu(void)
 					SNESOptionsUpdateText(SNES_MENU_GAMMA);
 					break;
 #endif
-#if defined(__GP2X__) || defined(__WIZ__) || defined(__PANDORA__)
+#if defined(__GP2X__) || defined(__WIZ__) || defined(__PANDORA__) || defined(__MIYOO__)
 				case SNES_MENU_ACTION_BUTTONS:
 					snesMenuOptions.actionButtons^=1;
 					SNESOptionsUpdateText(SNES_MENU_ACTION_BUTTONS);
@@ -2137,7 +2141,7 @@ int SNESOptionsMenu(void)
 					snesMenuOptions.transparency^=1;
 					SNESOptionsUpdateText(SNES_MENU_TRANSPARENCY);
 					break;
-#if defined(__GP2X__) || defined(__WIZ__) || defined(__PANDORA__)
+#if defined(__GP2X__) || defined(__WIZ__) || defined(__PANDORA__) || defined(__MIYOO__)
 				case SNES_MENU_RENDER_MODE:
 					if (Inp.held[INP_BUTTON_RIGHT]==1||Inp.repeat[INP_BUTTON_RIGHT])
 					{

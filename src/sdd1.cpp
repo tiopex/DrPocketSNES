@@ -45,7 +45,7 @@
 #include "display.h"
 
 #ifdef __linux
-#ifdef __PANDORA__
+#if defined(__PANDORA__) || defined(__MIYOO__)
 #include <unistd.h>
 #endif
 #endif

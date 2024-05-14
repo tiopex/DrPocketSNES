@@ -4,7 +4,7 @@ Part of the source code between 7.2.1 release and last bittrider's official rele
 
 ## What's needed TO be DOne:
 
-- fix ALSA output (pandora_sdk.c)
+- fix ALSA output (miyoo_sdk.c)
 - add basic bilinear [upscaler](https://github.com/m45t3r/snes9x2002/blob/b65e88f52329696ce04beef8527ab159bcb56903/shell/scalers/scaler.c#L31) from snes9x2002 codebase.
 - correct input mapping
 - add argument reading for loading ROM file.
