@@ -15,7 +15,21 @@
 #include <alsa/asoundlib.h>
 #include <time.h>
 
-#define SYS_CLK_FREQ 7372800
+// SNES9X2002 scaler macros:
+#define AVERAGE(z, x) ((((z) & 0xF7DEF7DE) >> 1) + (((x) & 0xF7DEF7DE) >> 1))
+#define AVERAGEHI(AB) ((((AB) & 0xF7DE0000) >> 1) + (((AB) & 0xF7DE) << 15))
+#define AVERAGELO(CD) ((((CD) & 0xF7DE) >> 1) + (((CD) & 0xF7DE0000) >> 17))
+#define Half(A) (((A) >> 1) & 0x7BEF)
+#define Quarter(A) (((A) >> 2) & 0x39E7)
+#define RestHalf(A) ((A) & 0x0821)
+#define RestQuarter(A) ((A) & 0x1863)
+#define Corr1_3(A, B)     Quarter(RestQuarter(A) + (RestHalf(B) << 1) + RestQuarter(B))
+#define Corr3_1(A, B)     Quarter((RestHalf(A) << 1) + RestQuarter(A) + RestQuarter(B))
+#define Corr1_1(A, B)     ((A) & (B) & 0x0821)
+#define Weight1_3(A, B)   (Quarter(A) + Half(B) + Quarter(B) + Corr1_3(A, B))
+#define Weight3_1(A, B)   (Half(A) + Quarter(A) + Quarter(B) + Corr3_1(A, B))
+#define Weight1_1(A, B)   (Half(A) + Half(B) + Corr1_1(A, B))
+
 #define SOUND_OUTPUT_FREQUENCY 22050
 #define SOUND_SAMPLES_SIZE 1024
 static snd_pcm_t *handle;
@@ -627,11 +641,15 @@ void gp_video_RGB_setscaling(int W, int H)
 			pSource+=32;
 			for (x = 64; x != 0; x--)
 			{
-				pTarget[0] = pSource[0];
-				pTarget[1] = pSource[1];
-				pTarget[2] = pSource[2];
-				pTarget[3] = pSource[3];
-				pTarget[4] = pSource[3];
+				uint16_t _1 = pSource[0];
+				pTarget[0] = _1;
+				uint16_t _2 = pSource[1];
+				pTarget[1] = Weight1_3( _1, _2);
+				uint16_t _3 = pSource[2];
+				pTarget[2] = Weight1_1( _2, _3);
+				uint16_t _4 = pSource[3];
+				pTarget[3] = Weight3_1( _3, _4);
+				pTarget[4] = _4;
 				pTarget+=5;
 				pSource+=4;		
 			}
@@ -647,11 +665,15 @@ void gp_video_RGB_setscaling(int W, int H)
 			pSource+=32;
 			for (x = 64; x != 0; x--)
 			{
-				pTarget[0] = pSource[0];
-				pTarget[1] = pSource[1];
-				pTarget[2] = pSource[2];
-				pTarget[3] = pSource[3];
-				pTarget[4] = pSource[3];
+				uint16_t _1 = pSource[0];
+				pTarget[0] = _1;
+				uint16_t _2 = pSource[1];
+				pTarget[1] = Weight1_3( _1, _2);
+				uint16_t _3 = pSource[2];
+				pTarget[2] = Weight1_1( _2, _3);
+				uint16_t _4 = pSource[3];
+				pTarget[3] = Weight3_1( _3, _4);
+				pTarget[4] = _4;
 				pTarget+=5;
 				pSource+=4;		
 			}
