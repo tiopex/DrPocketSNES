@@ -44,6 +44,7 @@ unsigned short *pOutputScreen;
 #ifdef __MIYOO__
 #include <unistd.h>
 #define TIMER_1_SECOND	1000000
+unsigned short *pOutputScreen;
 #include "miyoo_sdk.h"
 #endif
 
@@ -333,7 +334,7 @@ extern "C"
 	  
 	  if (snesMenuOptions.renderMode != RENDER_MODE_UNSCALED)
 	  {
-#if defined (__WIZ__)
+#if defined (__WIZ__) || defined(__MIYOO__)
 		if (PPU.ScreenHeight != SNES_HEIGHT_EXTENDED)
 			GFX.Screen = (uint8 *) pOutputScreen+ (640*8) + 64;
 		else
@@ -352,7 +353,7 @@ extern "C"
 
    bool8_32 S9xDeinitUpdate (int Width, int Height, bool8_32)
    {
-#if defined (__WIZ__)
+#if defined (__WIZ__) || defined(__MIYOO__)
 		if ( snesMenuOptions.renderMode == RENDER_MODE_SCALED)
 #else
 		if ( snesMenuOptions.renderMode == RENDER_MODE_SCALED && oldHeight!=Height)
@@ -361,7 +362,7 @@ extern "C"
 			gp_video_RGB_setscaling(256,Height);
 			oldHeight=Height;
 		}
-#if defined (__WIZ__)
+#if defined (__WIZ__) || defined(__MIYOO__)
 		else if ( snesMenuOptions.renderMode == RENDER_MODE_HORIZONTAL_SCALED)
 		{
 			gp_video_RGB_setHZscaling(256,Height); 
@@ -1338,7 +1339,7 @@ int main(int argc, char *argv[])
 	GFX.Delta = (GFX.SubScreen - GFX.Screen) >> 1;
 #endif
 
-#if defined(__WIZ__)
+#if defined(__WIZ__) || defined(__MIYOO__)
 	pOutputScreen = NULL;
 	pOutputScreen = (uint16 *)malloc(320*240*2);	
 #endif
@@ -1410,7 +1411,7 @@ int main(int argc, char *argv[])
 
 		if (action==EVENT_RUN_SNES_ROM)
 		{		
-#ifdef __WIZ__
+#if defined(__WIZ__) || defined(__MIYOO__)
 			// scaling ?
 	 		if (snesMenuOptions.renderMode == RENDER_MODE_UNSCALED) {
 				if (pOutputScreen) {
@@ -1715,7 +1716,7 @@ int main(int argc, char *argv[])
 	free(GFX.SubZBuffer);
 #endif
  
-#if defined(__WIZ__)
+#if defined(__WIZ__) || defined(__MIYOO__)
 	if (pOutputScreen) free(pOutputScreen);
 #endif
 #if defined(__GP2X__)

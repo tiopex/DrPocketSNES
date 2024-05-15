@@ -44,6 +44,7 @@ void gp_sound_volume(int l, int r);
 unsigned long gp_timer_read(void);
 unsigned int gp_getButton(unsigned char enable_diagnals);
 void gp_video_RGB_setscaling(int W, int H);
+void gp_video_RGB_setHZscaling(int W, int H);
 void gp2x_sound_play_bank(int bank);
 void gp2x_sound_sync(void);
 void set_gamma(int g100);
