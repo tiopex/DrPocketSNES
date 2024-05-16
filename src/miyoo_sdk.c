@@ -320,8 +320,8 @@ void gp_initGraphics(unsigned short bpp, int flip, int applyMmuHack)
 	gp_setClipping(0, 0, 319, 239);
 
 #ifdef DEBUG
-    printf("Entering gp_initGraphics....\r\n");
-#endif    
+	printf("Entering gp_initGraphics....\r\n");
+#endif
 	/*
 	First check that frame buffer memory has not already been setup
 	*/
@@ -374,9 +374,9 @@ void gp_initGraphics(unsigned short bpp, int flip, int applyMmuHack)
 	if (screen == NULL)
 {
 	screen = SDL_SetVideoMode(320, 240, bpp, SDL_SWSURFACE|SDL_FULLSCREEN);
-    if ( screen == NULL ) {
-        fprintf(stderr, "Unable to set 320x240 video: %s\n", SDL_GetError());
-        exit(1);
+	if ( screen == NULL ) {
+		fprintf(stderr, "Unable to set 320x240 video: %s\n", SDL_GetError());
+		exit(1);
     }
 
 		sgame = SDL_CreateRGBSurface(SDL_HWSURFACE, 320, 240, screen->format->BitsPerPixel,
@@ -396,10 +396,10 @@ void gp_initGraphics(unsigned short bpp, int flip, int applyMmuHack)
 		                    screen->format->Rmask,
 		                    screen->format->Gmask,
 		                    screen->format->Bmask, 0);
-	    if ( game[x] == NULL ) {
+		if ( game[x] == NULL ) {
 		fprintf(stderr, "Unable to create 320x240 surface: %s\n", SDL_GetError());
 		exit(1);
-	    }
+		}
 	}
 	SDL_ShowCursor(SDL_DISABLE);
 }
@@ -407,7 +407,7 @@ void gp_initGraphics(unsigned short bpp, int flip, int applyMmuHack)
 	gp_setFramebuffer(flip,1);
 	
 #ifdef DEBUG
-    printf("Leaving gp_initGraphics....\r\n");
+	printf("Leaving gp_initGraphics....\r\n");
 #endif 
 }
 
@@ -431,9 +431,9 @@ void gp_setFramebuffer(int flip, int sync)
 
 void gp2x_video_setpalette(void) 
 { 
-  //unsigned short *g=(unsigned short *)gp2x_palette; int i=512; 
-  //gp2x_memregs[0x2958>>1]=0;                                                      
-  //while(i--) gp2x_memregs[0x295A>>1]=*g++; 
+	//unsigned short *g=(unsigned short *)gp2x_palette; int i=512; 
+	//gp2x_memregs[0x2958>>1]=0;
+	//while(i--) gp2x_memregs[0x295A>>1]=*g++; 
 } 
 
 /* 
@@ -450,7 +450,7 @@ void *gp2x_sound_play(void)
 		Timer++;
 		CurrentSoundBank++;
 		if (CurrentSoundBank >= 8) CurrentSoundBank = 0;
-        snd_pcm_writei(handle, (void *)pOutput[CurrentSoundBank], samples);
+		snd_pcm_writei(handle, (void *)pOutput[CurrentSoundBank], samples);
 	}
 }
 
@@ -468,16 +468,16 @@ void gp2x_sound_volume(int l, int r)
 
 unsigned long gp_timer_read(void)
 {
-  // Once again another peice of direct hardware access bites the dust
-  // the code below is broken in firmware 2.1.1 so I've replaced it with a
-  // to a linux function which seems to work
-  //return gp2x_memregl[0x0A00>>2]/gp2x_ticks_per_second;
-  struct timeval tval; // timing
-  
-  gettimeofday(&tval, 0);
-  //tval.tv_usec
-  //tval.tv_sec
-  return (tval.tv_sec*1000000)+tval.tv_usec;
+	// Once again another peice of direct hardware access bites the dust
+	// the code below is broken in firmware 2.1.1 so I've replaced it with a
+	// to a linux function which seems to work
+	//return gp2x_memregl[0x0A00>>2]/gp2x_ticks_per_second;
+	struct timeval tval; // timing
+
+	gettimeofday(&tval, 0);
+	//tval.tv_usec
+	//tval.tv_sec
+	return (tval.tv_sec*1000000)+tval.tv_usec;
 }
 
 int gp_initSound(int rate, int bits, int stereo, int Hz, int frag, int hiMode)
@@ -564,12 +564,12 @@ int gp_initSound(int rate, int bits, int stereo, int Hz, int frag, int hiMode)
 
 	/* Set period size to settings.aica.BufferSize frames. */
 	if (hiMode) {
-	    samples = val / 100 *2 + 1;
-	    period_time = 20000;
+		samples = val / 100 *2 + 1;
+		period_time = 20000;
 	} else
 	{
-	    samples = val / 100 *2 + 1 - 74;
-	    period_time = 16643;
+		samples = val / 100 *2 + 1 - 74;
+		period_time = 16643;
 	}
 	rc = snd_pcm_hw_params_set_period_size_near(handle, params, &samples, NULL);
 	if (rc < 0)
@@ -590,7 +590,7 @@ int gp_initSound(int rate, int bits, int stereo, int Hz, int frag, int hiMode)
 		fprintf(stderr, "Error:snd_pcm_hw_params_set_period_time_near %s\n", snd_strerror(rc));
 		return 1;
 	}
-    printf("Actual Audio Freq %d Period %d bufsize %d period_time %d hiMode %d\n",rate, samples, buf_size, period_time, hiMode);
+	printf("Actual Audio Freq %d Period %d bufsize %d period_time %d hiMode %d\n",rate, samples, buf_size, period_time, hiMode);
 	/* Write the parameters to the driver */
 	rc = snd_pcm_hw_params(handle, params);
 	if (rc < 0)
