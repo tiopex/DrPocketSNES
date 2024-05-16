@@ -191,7 +191,7 @@ void SnesDefaultMenuOptions(void)
 {
 	// no options file loaded, so set to defaults
 	snesMenuOptions.menuVer=SNES_OPTIONS_VER;
-	snesMenuOptions.frameSkip=0;
+	snesMenuOptions.frameSkip=1;
 	snesMenuOptions.soundOn = 1;
 	snesMenuOptions.stereo = 1;
 	snesMenuOptions.volume=100; 
