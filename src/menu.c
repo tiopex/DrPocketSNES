@@ -2264,10 +2264,9 @@ int MainMenu(int prevaction)
 	gp_initGraphics(16,currFB,1);
 	gp_clearFramebuffer16((unsigned short*)framebuffer16[currFB],0x0);
 	MenuFlip();
-#if !defined(__WIZ__)
+#if !defined(__WIZ__) && !defined(__MIYOO__)
 	gp_video_RGB_setscaling(320,240);
 #endif
-	
 	memset(&headerDone,0,sizeof(headerDone));
 	MainMenuUpdateText();
 	
