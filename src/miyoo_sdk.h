@@ -34,7 +34,7 @@ void gp_setCpuspeed(unsigned int cpuspeed);
 void gp_initGraphics(unsigned short bpp, int flip, int applyMmuHack);
 void gp_setFramebuffer(int flip, int sync);
 void gp2x_video_setpalette(void);
-int gp_initSound(int rate, int bits, int stereo, int Hz, int frag, int hiMode);
+int gp_initSound(int rate, int bits, int stereo, int Hz, int frag, int frame_limit);
 void gp_stopSound(void);
 void gp_Reset(void);
 void gp2x_enableIRQ(void);

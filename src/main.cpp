@@ -1525,7 +1525,7 @@ int main(int argc, char *argv[])
 				samplecount=Settings.SoundPlaybackRate/frame_limit;
 				if (Settings.Stereo)
 					samplecount = samplecount * 2;
-				gp_initSound(Settings.SoundPlaybackRate,16,Settings.Stereo,frame_limit,0x0002000F, Memory.HiROM);
+				gp_initSound(Settings.SoundPlaybackRate,16,Settings.Stereo,frame_limit,0x0002000F, frame_limit);
 				so.stereo = Settings.Stereo;
 				so.playback_rate = Settings.SoundPlaybackRate;
 				S9xSetPlaybackRate(so.playback_rate);

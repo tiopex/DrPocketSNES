@@ -57,6 +57,7 @@ volatile int SoundThreadFlag=0;
 volatile int CurrentSoundBank=0;
 int CurrentFrameBuffer=0;
 int CurrentFrag=0;
+int CurrentFrameLimit=0;
 unsigned int ExistingIntHandler;
 snd_pcm_uframes_t samples=0;
 
@@ -373,11 +374,11 @@ void gp_initGraphics(unsigned short bpp, int flip, int applyMmuHack)
 
 	if (screen == NULL)
 {
-	screen = SDL_SetVideoMode(320, 240, bpp,SDL_HWSURFACE|SDL_FULLSCREEN|SDL_DOUBLEBUF);
+	screen = SDL_SetVideoMode(320, 240, bpp, SDL_HWSURFACE|SDL_FULLSCREEN|SDL_DOUBLEBUF);
 	if ( screen == NULL ) {
 		fprintf(stderr, "Unable to set 320x240 video: %s\n", SDL_GetError());
 		exit(1);
-    }
+	}
 
 		sgame = SDL_CreateRGBSurface(SDL_HWSURFACE, 320, 240, screen->format->BitsPerPixel,
 		                    screen->format->Rmask,
@@ -413,7 +414,6 @@ void gp_initGraphics(unsigned short bpp, int flip, int applyMmuHack)
 
 void gp_setFramebuffer(int flip, int sync)
 {
-	//CurrentFrameBuffer=flip;
 
 	//printf("%d\n", flip);
 
@@ -480,7 +480,7 @@ unsigned long gp_timer_read(void)
 	return (tval.tv_sec*1000000)+tval.tv_usec;
 }
 
-int gp_initSound(int rate, int bits, int stereo, int Hz, int frag, int hiMode)
+int gp_initSound(int rate, int bits, int stereo, int Hz, int frag, int frame_limit)
 {
 	int status;
 	int i=0;
@@ -493,7 +493,10 @@ int gp_initSound(int rate, int bits, int stereo, int Hz, int frag, int hiMode)
 	uint32_t val;
 	int32_t dir = 0;
 
-	
+	if (handle && CurrentFrameLimit != frame_limit) {
+		snd_pcm_drain(handle);
+		snd_pcm_close(handle);
+	}
 	/* Open PCM device for playback. */
 	int32_t rc = snd_pcm_open(&handle, "default", SND_PCM_STREAM_PLAYBACK, 0);
 
@@ -562,15 +565,9 @@ int gp_initSound(int rate, int bits, int stereo, int Hz, int frag, int hiMode)
 		return 1;
 	}
 
-	/* Set period size to settings.aica.BufferSize frames. */
-	if (hiMode) {
-		samples = val / 100 *2 + 1;
-		period_time = 20000;
-	} else
-	{
-		samples = val / 100 *2 + 1 - 74;
-		period_time = 16643;
-	}
+	samples = val / frame_limit;
+	period_time = samples / val * 1000000;
+	CurrentFrameLimit = frame_limit;
 	rc = snd_pcm_hw_params_set_period_size_near(handle, params, &samples, NULL);
 	if (rc < 0)
 	{
@@ -590,7 +587,7 @@ int gp_initSound(int rate, int bits, int stereo, int Hz, int frag, int hiMode)
 		fprintf(stderr, "Error:snd_pcm_hw_params_set_period_time_near %s\n", snd_strerror(rc));
 		return 1;
 	}
-	printf("Actual Audio Freq %d Period %d bufsize %d period_time %d hiMode %d\n",rate, samples, buf_size, period_time, hiMode);
+	printf("Actual Audio Freq %d Period %d bufsize %d period_time %d frame_limit %d\n",rate, samples, buf_size, period_time, frame_limit);
 	/* Write the parameters to the driver */
 	rc = snd_pcm_hw_params(handle, params);
 	if (rc < 0)
