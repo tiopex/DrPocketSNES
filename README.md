@@ -8,7 +8,7 @@ Part of the source code between 7.2.1 release and last bittrider's official rele
 - ~~add basic bilinear [upscaler](https://github.com/m45t3r/snes9x2002/blob/b65e88f52329696ce04beef8527ab159bcb56903/shell/scalers/scaler.c#L31) from snes9x2002 codebase.~~
 - correct input mapping
 - add argument reading for loading ROM file.
-- optimize output target
+- ~~optimize output target~~
 - ~~remove redundant settings options.~~
 
 ## Build steps for MiyooCFW
@@ -23,5 +23,4 @@ cd /src
 make clean
 make
 ```
-
-If you need to build for other libc implementation, utilize static SDK from release page with appriorate linking flags.
+It is recommended to use COMPATIBLE build, thus `make comp`

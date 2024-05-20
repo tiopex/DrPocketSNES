@@ -2,19 +2,21 @@
 
 ## Common vars
 
-DEFAULT = wiz
+HOMEPATH = /mnt
+DEFAULT = miyoo
 NFAST =	fast
 NCOMP = compatible
-ALL_TARGETS = wiz
+ALL_TARGETS = miyoo
 ODIR_SUFFIX = objs
-PNAME = pocketsnes
+PNAME = drpocketsnes
+
+PROFILE ?= 0
 
 ## First stage
 ifneq ($(STAGE),2)
 
 FILE_DATE = $(shell date +%Y-%m-%d)
 
-export MNAME
 export VNAME
 export COPT
 export OBJS
@@ -24,7 +26,13 @@ export STAGE
 export FILE_DATE
 
 all: 
-	make wiz
+	$(MAKE) miyoo
+
+fast:
+	$(MAKE) miyoof
+
+comp:
+	$(MAKE) miyooc
 
 # default to fast version
 default: $(DEFAULT)f
@@ -39,8 +47,8 @@ clean:
 
 # when release is targeted compile both fast and compatible versions
 release: 
-	make $(DEFAULT)f
-	make $(DEFAULT)c
+	$(MAKE) $(DEFAULT)f
+	$(MAKE) $(DEFAULT)c
 	rm -f rel/*.gpe
 	cp $(PNAME)_$(DEFAULT)_*.gpe rel/.
 	zip $(PNAME)-$(FILE_DATE).zip rel/*
@@ -48,41 +56,40 @@ release:
 # invoke stage 2
 do: STAGE = 2
 do: 
-	make
+	$(MAKE)
 
 # ---------------------
-# Wiz
+# Common flags
 # ---------------------
 
-# -- Wiz common
-wiz_common: MNAME = wiz
-wiz_common: COPT += -mcpu=arm926ej-s -mtune=arm926ej-s -g -D__MIYOO__
-#wiz_common: COPT += -D__FAST_OBJS__
-wiz_common: COPT += -O3 -fno-inline
-wiz_common: COPT += -finline-limit=42 -fno-unroll-loops -fno-ipa-cp -ffast-math
-wiz_common: COPT += -fno-common -fno-stack-protector -fno-guess-branch-probability -fno-caller-saves -fno-regmove 
+# -- common
+common: COPT += -mcpu=arm926ej-s -mtune=arm926ej-s -g -D__MIYOO__
+#common: COPT += -D__FAST_OBJS__
+common: COPT += -O3 -fno-inline
+common: COPT += -finline-limit=42 -fno-unroll-loops -fno-ipa-cp -ffast-math
+common: COPT += -fno-common -fno-stack-protector -fno-caller-saves -fno-regmove 
 # Use "Delayed Raster FX" if enabled
-wiz_common: COPT += -D__OLD_RASTER_FX__
+common: COPT += -D__OLD_RASTER_FX__
 # Miyoo obj
-wiz_common: OBJS = miyoo_sdk.o
-wiz_common: OBJS += os9x_65c816_global.o os9x_65c816_spcasm.o os9x_65c816_spcc.o os9x_asm_cpu.o
-wiz_common: ARCH = $(CROSS_COMPILE)
-wiz_common: SDK = $(CROSS_ROOT)/usr
-wiz_common: do
+common: OBJS = miyoo_sdk.o
+common: OBJS += os9x_65c816_global.o os9x_65c816_spcasm.o os9x_65c816_spcc.o os9x_asm_cpu.o
+common: ARCH = $(CROSS_COMPILE)
+common: SDK = $(CROSS_ROOT)/usr
+common: do
 
 # -- Fast version
-wizf: VNAME = $(NFAST)
-wizf: COPT = -DASMCPU -DDEBUG
-wizf: wiz_common
+miyoof: VNAME = $(NFAST)
+miyoof: COPT = -DASMCPU -DDEBUG
+miyoof: common
 
 # -- Normal version 
-wizc: VNAME = $(NCOMP)
-wizc: COPT = -DUSE_SA1 -DDEBUG
-wizc: wiz_common
+miyooc: VNAME = $(NCOMP)
+miyooc: COPT = -DUSE_SA1 -DDEBUG
+miyooc: common
 
-wiz:
-	make $@f
-	make $@c
+miyoo:
+	$(MAKE) $@f
+	$(MAKE) $@c
 	
 ## Second stage
 else
@@ -92,8 +99,19 @@ GCC = $(TOOLS)/$(ARCH)gcc
 STRIP = $(TOOLS)/$(ARCH)strip
 ADSASM = $(TOOLS)/$(ARCH)as
 CFLAGS = -Isrc
-LIBS = -I$(SDK)/include 
+LIBS = -I$(SDK)/include
 ODIR = $(VNAME)_$(ODIR_SUFFIX)
+
+# PGO (gcc 9)
+ifeq ($(PROFILE), YES)
+CFLAGS	+= -fprofile-generate=$(HOMEPATH)/profile
+LIBS += -lgcov
+else ifeq ($(PROFILE), APPLY)
+CFLAGS	+= -fprofile-use=profile -fbranch-probabilities
+else
+CFLAGS	+= -fno-guess-branch-probability
+endif
+
 # Inopia's menu system, hacked for the GP2X under rlyeh's sdk
 PRELIBS = -lpthread -lz $(LIBS)
 
