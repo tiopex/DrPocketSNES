@@ -373,7 +373,7 @@ void gp_initGraphics(unsigned short bpp, int flip, int applyMmuHack)
 
 	if (screen == NULL)
 {
-	screen = SDL_SetVideoMode(320, 240, bpp, SDL_SWSURFACE|SDL_FULLSCREEN);
+	screen = SDL_SetVideoMode(320, 240, bpp,SDL_HWSURFACE|SDL_FULLSCREEN|SDL_DOUBLEBUF);
 	if ( screen == NULL ) {
 		fprintf(stderr, "Unable to set 320x240 video: %s\n", SDL_GetError());
 		exit(1);
