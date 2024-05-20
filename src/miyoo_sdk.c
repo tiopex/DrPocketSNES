@@ -413,7 +413,7 @@ void gp_initGraphics(unsigned short bpp, int flip, int applyMmuHack)
 
 void gp_setFramebuffer(int flip, int sync)
 {
-	CurrentFrameBuffer=flip;
+	//CurrentFrameBuffer=flip;
 
 	//printf("%d\n", flip);
 
@@ -423,8 +423,8 @@ void gp_setFramebuffer(int flip, int sync)
 	//SDL_BlitSurface(sgame, NULL, screen, NULL);
 	//SDL_SoftStretch( sgame, NULL, screen, NULL );
 
-	SDL_SoftStretch( game[CurrentFrameBuffer], NULL, screen, NULL );
-	//SDL_BlitSurface(game[CurrentFrameBuffer], NULL, screen, NULL);
+	//SDL_SoftStretch( game[CurrentFrameBuffer], NULL, screen, NULL );
+	SDL_BlitSurface(game[flip], NULL, screen, NULL);
 
 	SDL_Flip(screen);
 }
