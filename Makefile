@@ -58,7 +58,7 @@ do:
 wiz_common: MNAME = wiz
 wiz_common: COPT += -mcpu=arm926ej-s -mtune=arm926ej-s -g -D__MIYOO__
 #wiz_common: COPT += -D__FAST_OBJS__
-wiz_common: COPT += -O3
+wiz_common: COPT += -O3 -fno-inline
 wiz_common: COPT += -finline-limit=42 -fno-unroll-loops -fno-ipa-cp -ffast-math
 wiz_common: COPT += -fno-common -fno-stack-protector -fno-guess-branch-probability -fno-caller-saves -fno-regmove 
 # Use "Delayed Raster FX" if enabled
@@ -77,7 +77,7 @@ wizf: wiz_common
 
 # -- Normal version 
 wizc: VNAME = $(NCOMP)
-wizc: COPT = -DUSE_SA1 -DDEBUG 
+wizc: COPT = -DUSE_SA1 -DDEBUG
 wizc: wiz_common
 
 wiz:
@@ -134,7 +134,7 @@ FOBJS = $(addprefix $(ODIR)/,$(OBJS))
 COPT += $(CFLAGS) $(INCS) $(LIBS)
 
 executable: $(FOBJS)
-	$(GCC) $(COPT) $(FOBJS) -o $(PNAME)_$(VNAME)_d -lSDL -lasound -lstdc++ -lz -lpthread
+	$(GCC) $(COPT) $(FOBJS) -o $(PNAME)_$(VNAME)_d -lSDL -lasound -lstdc++ -lz -lpthread -lts
 	$(STRIP) $(PNAME)_$(VNAME)_d -o $(PNAME)_$(VNAME)
 
 $(FOBJS): | $(ODIR)
