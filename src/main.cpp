@@ -60,6 +60,7 @@ unsigned short *pOutputScreen;
 #include "config.h"
 
 #define EMUVERSION "SquidgeSNES V0.37 01-Jun-06"
+#define MAXPATHLEN 256
 
 //---------------------------------------------------------------------------
 
@@ -114,6 +115,7 @@ char lastLoadedFile[2048];
 bool lastLoaded = false;
 unsigned short *loadingFB;
 int loadingY;
+char *romfile = NULL;
 static void loadingPrint(char *txt) {
 	gp_drawString(20, loadingY, strlen(txt), txt, tTextColorLoading, (unsigned char*)loadingFB);
 	loadingY += 8;
@@ -752,9 +754,14 @@ static int SnesRomLoad()
 	char text[2048];
 	FILE *stream=NULL;
   
- 	
+	if (romfile) {
+		sprintf(filename,"%s%s%s",romDir,DIR_SEP,romfile);
+		fLoad = filename;
+		cFile = romfile;
+		currentRomFilename[0] = *romfile;
+	}
 	// get full filename
-	if (!lastLoaded) {
+	else if (!lastLoaded) {
 		sprintf(filename,"%s%s%s",romDir,DIR_SEP,currentRomFilename);
 		fLoad = filename;
 		cFile = currentRomFilename;
@@ -1197,6 +1204,9 @@ int main(int argc, char *argv[])
 	int action=0;
 	int romloaded=0;
 	char text[256];
+	char file[MAXPATHLEN] = "";
+	char path[MAXPATHLEN];
+	char romfilename[MAXPATHLEN];
 	DIR *d;
 	
 	g_argv = argv;
@@ -1362,9 +1372,23 @@ int main(int argc, char *argv[])
 
 	if (!S9xGraphicsInit ())
          erk();
+	// read command line options
+	if (argc >= 1 ) {
+		strncpy(romfilename, argv[1], MAXPATHLEN);
+		if (romfilename[0] != '/') {
+			getcwd(path, MAXPATHLEN);
+			if (strlen(path) + strlen(romfilename) + 1 < MAXPATHLEN) {
+				strcat(path, "/");
+				strcat(path, romfilename);
+				strcpy(romfilename, path);
+			} else
+				romfilename[0] = 0;
+		}
+		romfile = romfilename;
+	}
 
 	// Look for last loaded game
-	if (snesMenuOptions.loadOnInit == 1) {
+	if (!romfile && snesMenuOptions.loadOnInit == 1) {
 		getConfigValue(CONFIG_LASTLOADED, lastLoadedFile, sizeof(lastLoadedFile)-1) ;
 		action = EVENT_LOAD_SNES_ROM;
 		lastLoaded = true;
@@ -1374,7 +1398,9 @@ int main(int argc, char *argv[])
 	{
 		S9xSetSoundMute (TRUE);
 
-		if (!lastLoaded) {
+		if (romfile) {
+			action=EVENT_LOAD_SNES_ROM;
+		} else if (!lastLoaded) {
 			getScreenShot(framebuffer16[prevFB]);
 			initTheme();
 			action=MainMenu(action);
@@ -1391,6 +1417,7 @@ int main(int argc, char *argv[])
 			gp_setCpuspeed(MENU_FAST_CPU_SPEED);
 			romloaded=SnesRomLoad();
 			gp_setCpuspeed(MENU_CPU_SPEED);
+			romfile=NULL;
 			if(romloaded)  	
 			{
 				int x;
@@ -1525,7 +1552,7 @@ int main(int argc, char *argv[])
 				samplecount=Settings.SoundPlaybackRate/frame_limit;
 				if (Settings.Stereo)
 					samplecount = samplecount * 2;
-				gp_initSound(Settings.SoundPlaybackRate,16,Settings.Stereo,frame_limit,0x0002000F, Memory.HiROM);
+				gp_initSound(Settings.SoundPlaybackRate,16,Settings.Stereo,frame_limit,0x0002000F, frame_limit);
 				so.stereo = Settings.Stereo;
 				so.playback_rate = Settings.SoundPlaybackRate;
 				S9xSetPlaybackRate(so.playback_rate);
