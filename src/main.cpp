@@ -765,7 +765,7 @@ static int SnesRomLoad()
 		sprintf(filename,"%s%s%s",romDir,DIR_SEP,currentRomFilename);
 		fLoad = filename;
 		cFile = currentRomFilename;
-		}
+	}
 	else {
 		int x;
 		x = strlen(lastLoadedFile);
@@ -777,7 +777,7 @@ static int SnesRomLoad()
 		fLoad = lastLoadedFile;
 		cFile = &lastLoadedFile[x];
 		strcpy(currentRomFilename, cFile);
-		}
+	}
 	
    	//gp_clearFramebuffer16(framebuffer16[currFB],0x0);
 	loadingFB = framebuffer16[currFB];
@@ -1375,16 +1375,21 @@ int main(int argc, char *argv[])
 	// pass first extra arg as ROM file
 	if (argc == 2) {
 		strncpy(romfilename, argv[1], MAXPATHLEN);
-		if (romfilename[0] != '/') {
-			getcwd(path, MAXPATHLEN);
-			if (strlen(path) + strlen(romfilename) + 1 < MAXPATHLEN) {
-				strcat(path, "/");
-				strcat(path, romfilename);
-				strcpy(romfilename, path);
-			} else
-				romfilename[0] = 0;
+		char *ext = strrchr(romfilename, '.');
+		if (ext != NULL && strcmp(ext,".zip") == 0 || strcmp(ext,".smc") == 0 || strcmp(ext,".sfc") == 0) {
+			if (romfilename[0] != '/') {
+				getcwd(path, MAXPATHLEN);
+				if (strlen(path) + strlen(romfilename) + 1 < MAXPATHLEN) {
+					strcat(path, "/");
+					strcat(path, romfilename);
+					strcpy(romfilename, path);
+				} else
+					romfilename[0] = 0;
+			}
+			romfile = romfilename;
+		} else {
+			fprintf(stderr, "No valid ROM extension found in %s file with ext: %s\n", romfilename, ext + 1);
 		}
-		romfile = romfilename;
 	} else if (argc > 2) {
 		fprintf(stderr, "Provided to many arguments with: ");
 	    for (int i = 2; i < argc; i++) {
@@ -1411,7 +1416,7 @@ int main(int argc, char *argv[])
 			initTheme();
 			action=MainMenu(action);
 			destroyScreenShot();
-			}
+		}
 
 		//gp_clearFramebuffer16(framebuffer16[currFB],0x0);
 		if (action==EVENT_EXIT_APP) break;
