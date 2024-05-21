@@ -1372,8 +1372,8 @@ int main(int argc, char *argv[])
 
 	if (!S9xGraphicsInit ())
          erk();
-	// read command line options
-	if (argc >= 1 ) {
+	// pass first extra arg as ROM file
+	if (argc == 2) {
 		strncpy(romfilename, argv[1], MAXPATHLEN);
 		if (romfilename[0] != '/') {
 			getcwd(path, MAXPATHLEN);
@@ -1385,6 +1385,12 @@ int main(int argc, char *argv[])
 				romfilename[0] = 0;
 		}
 		romfile = romfilename;
+	} else if (argc > 2) {
+		fprintf(stderr, "Provided to many arguments with: ");
+	    for (int i = 2; i < argc; i++) {
+			fprintf(stderr, "%s ", argv[i]);
+		}
+		fprintf(stderr, "\n");
 	}
 
 	// Look for last loaded game
