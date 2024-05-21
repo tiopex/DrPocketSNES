@@ -374,11 +374,11 @@ void gp_initGraphics(unsigned short bpp, int flip, int applyMmuHack)
 
 	if (screen == NULL)
 {
-	screen = SDL_SetVideoMode(320, 240, bpp,SDL_HWSURFACE|SDL_FULLSCREEN|SDL_DOUBLEBUF);
+	screen = SDL_SetVideoMode(320, 240, bpp, SDL_HWSURFACE|SDL_FULLSCREEN|SDL_DOUBLEBUF);
 	if ( screen == NULL ) {
 		fprintf(stderr, "Unable to set 320x240 video: %s\n", SDL_GetError());
 		exit(1);
-    }
+	}
 
 		sgame = SDL_CreateRGBSurface(SDL_HWSURFACE, 320, 240, screen->format->BitsPerPixel,
 		                    screen->format->Rmask,
@@ -414,7 +414,6 @@ void gp_initGraphics(unsigned short bpp, int flip, int applyMmuHack)
 
 void gp_setFramebuffer(int flip, int sync)
 {
-	//CurrentFrameBuffer=flip;
 
 	//printf("%d\n", flip);
 
