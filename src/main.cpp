@@ -60,7 +60,6 @@ unsigned short *pOutputScreen;
 #include "config.h"
 
 #define EMUVERSION "SquidgeSNES V0.37 01-Jun-06"
-#define MAXPATHLEN 256
 
 //---------------------------------------------------------------------------
 
@@ -755,10 +754,14 @@ static int SnesRomLoad()
 	FILE *stream=NULL;
   
 	if (romfile) {
-		sprintf(filename,"%s%s%s",romDir,DIR_SEP,romfile);
-		fLoad = filename;
-		cFile = romfile;
-		currentRomFilename[0] = *romfile;
+		cFile = strrchr(romfile, '/');
+            if (cFile) {
+                cFile++;
+            } else {
+                cFile = romfile;
+            }
+		fLoad = romfile;
+		strcpy(currentRomFilename, cFile);
 	}
 	// get full filename
 	else if (!lastLoaded) {
@@ -1204,9 +1207,9 @@ int main(int argc, char *argv[])
 	int action=0;
 	int romloaded=0;
 	char text[256];
-	char file[MAXPATHLEN] = "";
-	char path[MAXPATHLEN];
-	char romfilename[MAXPATHLEN];
+	char file[MAX_PATH+1] = "";
+	char path[MAX_PATH+1];
+	char romfilename[MAX_PATH+1];
 	DIR *d;
 	
 	g_argv = argv;
@@ -1374,12 +1377,12 @@ int main(int argc, char *argv[])
          erk();
 	// pass first extra arg as ROM file
 	if (argc == 2) {
-		strncpy(romfilename, argv[1], MAXPATHLEN);
+		strncpy(romfilename, argv[1], MAX_PATH+1);
 		char *ext = strrchr(romfilename, '.');
 		if (ext != NULL && strcmp(ext,".zip") == 0 || strcmp(ext,".smc") == 0 || strcmp(ext,".sfc") == 0) {
 			if (romfilename[0] != '/') {
-				getcwd(path, MAXPATHLEN);
-				if (strlen(path) + strlen(romfilename) + 1 < MAXPATHLEN) {
+				getcwd(path, MAX_PATH+1);
+				if (strlen(path) + strlen(romfilename) + 1 < MAX_PATH+1) {
 					strcat(path, "/");
 					strcat(path, romfilename);
 					strcpy(romfilename, path);
