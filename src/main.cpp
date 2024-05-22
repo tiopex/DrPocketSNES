@@ -114,6 +114,7 @@ char lastLoadedFile[2048];
 bool lastLoaded = false;
 unsigned short *loadingFB;
 int loadingY;
+char *romfile = NULL;
 static void loadingPrint(char *txt) {
 	gp_drawString(20, loadingY, strlen(txt), txt, tTextColorLoading, (unsigned char*)loadingFB);
 	loadingY += 8;
@@ -752,13 +753,22 @@ static int SnesRomLoad()
 	char text[2048];
 	FILE *stream=NULL;
   
- 	
+	if (romfile) {
+		cFile = strrchr(romfile, '/');
+            if (cFile) {
+                cFile++;
+            } else {
+                cFile = romfile;
+            }
+		fLoad = romfile;
+		strcpy(currentRomFilename, cFile);
+	}
 	// get full filename
-	if (!lastLoaded) {
+	else if (!lastLoaded) {
 		sprintf(filename,"%s%s%s",romDir,DIR_SEP,currentRomFilename);
 		fLoad = filename;
 		cFile = currentRomFilename;
-		}
+	}
 	else {
 		int x;
 		x = strlen(lastLoadedFile);
@@ -770,7 +780,7 @@ static int SnesRomLoad()
 		fLoad = lastLoadedFile;
 		cFile = &lastLoadedFile[x];
 		strcpy(currentRomFilename, cFile);
-		}
+	}
 	
    	//gp_clearFramebuffer16(framebuffer16[currFB],0x0);
 	loadingFB = framebuffer16[currFB];
@@ -1197,6 +1207,9 @@ int main(int argc, char *argv[])
 	int action=0;
 	int romloaded=0;
 	char text[256];
+	char file[MAX_PATH+1] = "";
+	char path[MAX_PATH+1];
+	char romfilename[MAX_PATH+1];
 	DIR *d;
 	
 	g_argv = argv;
@@ -1362,9 +1375,34 @@ int main(int argc, char *argv[])
 
 	if (!S9xGraphicsInit ())
          erk();
+	// pass first extra arg as ROM file
+	if (argc == 2) {
+		strncpy(romfilename, argv[1], MAX_PATH+1);
+		char *ext = strrchr(romfilename, '.');
+		if (ext != NULL && strcmp(ext,".zip") == 0 || strcmp(ext,".smc") == 0 || strcmp(ext,".sfc") == 0) {
+			if (romfilename[0] != '/') {
+				getcwd(path, MAX_PATH+1);
+				if (strlen(path) + strlen(romfilename) + 1 < MAX_PATH+1) {
+					strcat(path, "/");
+					strcat(path, romfilename);
+					strcpy(romfilename, path);
+				} else
+					romfilename[0] = 0;
+			}
+			romfile = romfilename;
+		} else {
+			fprintf(stderr, "No valid ROM extension found in %s file with ext: %s\n", romfilename, ext + 1);
+		}
+	} else if (argc > 2) {
+		fprintf(stderr, "Provided to many arguments with: ");
+	    for (int i = 2; i < argc; i++) {
+			fprintf(stderr, "%s ", argv[i]);
+		}
+		fprintf(stderr, "\n");
+	}
 
 	// Look for last loaded game
-	if (snesMenuOptions.loadOnInit == 1) {
+	if (!romfile && snesMenuOptions.loadOnInit == 1) {
 		getConfigValue(CONFIG_LASTLOADED, lastLoadedFile, sizeof(lastLoadedFile)-1) ;
 		action = EVENT_LOAD_SNES_ROM;
 		lastLoaded = true;
@@ -1374,12 +1412,14 @@ int main(int argc, char *argv[])
 	{
 		S9xSetSoundMute (TRUE);
 
-		if (!lastLoaded) {
+		if (romfile) {
+			action=EVENT_LOAD_SNES_ROM;
+		} else if (!lastLoaded) {
 			getScreenShot(framebuffer16[prevFB]);
 			initTheme();
 			action=MainMenu(action);
 			destroyScreenShot();
-			}
+		}
 
 		//gp_clearFramebuffer16(framebuffer16[currFB],0x0);
 		if (action==EVENT_EXIT_APP) break;
@@ -1391,6 +1431,7 @@ int main(int argc, char *argv[])
 			gp_setCpuspeed(MENU_FAST_CPU_SPEED);
 			romloaded=SnesRomLoad();
 			gp_setCpuspeed(MENU_CPU_SPEED);
+			romfile=NULL;
 			if(romloaded)  	
 			{
 				int x;
