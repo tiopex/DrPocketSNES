@@ -25,11 +25,7 @@
 
 #ifdef __WIZ__
 #define TIMER_1_SECOND	1000000
-  #ifdef __CAANOO__
-	#include "caanoo_sdk.h"
-  #else
-  	#include "wiz_sdk.h"
-  #endif
+#include "wiz_sdk.h"
 #include "time.h"
 unsigned short *pOutputScreen;
 #include "sys/resource.h"
@@ -352,8 +348,8 @@ extern "C"
 	   return (TRUE);
    }
 
-   bool8_32 S9xDeinitUpdate (int Width, int Height, bool8_32)
-   {
+	bool8_32 S9xDeinitUpdate (int Width, int Height, bool8_32)
+	{
 #if defined (__WIZ__) || defined(__MIYOO__)
 		if ( snesMenuOptions.renderMode == RENDER_MODE_SCALED)
 #else
@@ -422,28 +418,28 @@ extern "C"
 		
 		gp_setFramebuffer(currFB,0);
 		return (TRUE);
-   }
+	}
 
-   const char *S9xGetFilename (const char *ex)
-   {
-      static char filename [PATH_MAX + 1];
-      char drive [_MAX_DRIVE + 1];
-      char dir [_MAX_DIR + 1];
-      char fname [_MAX_FNAME + 1];
-      char ext [_MAX_EXT + 1];
+	const char *S9xGetFilename (const char *ex)
+	{
+		static char filename [PATH_MAX + 1];
+		char drive [_MAX_DRIVE + 1];
+		char dir [_MAX_DIR + 1];
+		char fname [_MAX_FNAME + 1];
+		char ext [_MAX_EXT + 1];
 
-      _splitpath (Memory.ROMFilename, drive, dir, fname, ext);
-      strcpy (filename, S9xGetSnapshotDirectory ());
-      strcat (filename, SLASH_STR);
-      strcat (filename, fname);
-      strcat (filename, ex);
+		_splitpath (Memory.ROMFilename, drive, dir, fname, ext);
+		strcpy (filename, S9xGetSnapshotDirectory ());
+		strcat (filename, SLASH_STR);
+		strcat (filename, fname);
+		strcat (filename, ex);
 
-      return (filename);
-   }
+		return (filename);
+	}
 
 #ifdef __GIZ__
-   uint32 S9xReadJoypad (int which1)
-   {
+	uint32 S9xReadJoypad (int which1)
+	{
 	   uint32 val=0x80000000;
 
 	   if (which1 != 0) return val;
@@ -464,13 +460,13 @@ extern "C"
 		if (joy & (1<<INP_BUTTON_R)) val |= SNES_TR_MASK;
 		
 		if (joy & (1<<INP_BUTTON_BRIGHT))	enterMenu = 1;
-      return val;
-   }
+		return val;
+	}
 #endif
 
 #ifdef __GP2X__
-   uint32 S9xReadJoypad (int which1)
-   {
+	uint32 S9xReadJoypad (int which1)
+	{
 		uint32 val=0x80000000;
 		unsigned long joy = 0;
 		
@@ -521,13 +517,13 @@ extern "C"
 			gp_sound_volume(snesMenuOptions.volume,snesMenuOptions.volume);
 		}
 		
-      return val;
-   }
+		return val;
+	}
 #endif
 
 #if defined(__WIZ__)  || defined(__PANDORA__) || defined(__MIYOO__)
-   uint32 S9xReadJoypad (int which1)
-   {
+	uint32 S9xReadJoypad (int which1)
+	{
 		uint32 val=0x80000000;
 		if (which1 != 0) return val;
 
@@ -537,10 +533,17 @@ extern "C"
 
 		if (snesMenuOptions.actionButtons)
 		{
+#ifdef __MIYOO__
+			if (joy & (1<<INP_BUTTON_A)) val |= SNES_B_MASK;
+			if (joy & (1<<INP_BUTTON_B)) val |= SNES_A_MASK;
+			if (joy & (1<<INP_BUTTON_X)) val |= SNES_Y_MASK;
+			if (joy & (1<<INP_BUTTON_Y)) val |= SNES_X_MASK;
+#else
 			if (joy & (1<<INP_BUTTON_A)) val |= SNES_Y_MASK;
 			if (joy & (1<<INP_BUTTON_B)) val |= SNES_A_MASK;
 			if (joy & (1<<INP_BUTTON_X)) val |= SNES_B_MASK;
 			if (joy & (1<<INP_BUTTON_Y)) val |= SNES_X_MASK;
+#endif
 		}
 		else
 		{
@@ -560,12 +563,11 @@ extern "C"
 		
 		if (joy & (1<<INP_BUTTON_SELECT)) val |= SNES_SELECT_MASK;
 		
-#ifdef __CAANOO__
+#if defined(__MIYOO__)
 		if (joy & (1<<INP_BUTTON_HOME))	enterMenu = 1;
 #else
 		if (((joy & (1<<INP_BUTTON_VOL_UP)) && (joy & (1<<INP_BUTTON_VOL_DOWN))) ||
 		    ((joy & (1<<INP_BUTTON_L)) && (joy & (1<<INP_BUTTON_R)) && (joy & (1<<INP_BUTTON_SELECT)))) enterMenu = 1;
-#endif
 		else if (joy & (1<<INP_BUTTON_VOL_UP)) 
 		{
 			snesMenuOptions.volume+=1;
@@ -575,12 +577,12 @@ extern "C"
 		else if (joy & (1<<INP_BUTTON_VOL_DOWN))	
 		{
 			snesMenuOptions.volume-=1;
-			if(snesMenuOptions.volume>100) snesMenuOptions.volume=0;
+			if(snesMenuOptions.volume<0) snesMenuOptions.volume=0;
 			gp_sound_volume(snesMenuOptions.volume,snesMenuOptions.volume);
 		}
-		
-      return val;
-   }
+#endif
+		return val;
+	}
 #endif
 
    bool8 S9xReadMousePosition (int /* which1 */, int &/* x */, int & /* y */,

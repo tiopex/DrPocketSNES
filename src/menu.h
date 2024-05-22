@@ -21,11 +21,7 @@ extern "C" {
 		#include "gp2x_sdk.h"
 	#endif
 	#ifdef __WIZ__
-	 	#ifdef __CAANOO__
-			#include "caanoo_sdk.h"
-		#else
-			#include "wiz_sdk.h"
-		#endif
+		#include "wiz_sdk.h"
 	#endif
 	#ifdef __PANDORA__
 		#include "pandora_sdk.h"
@@ -80,11 +76,7 @@ extern "C" {
 #endif
 
 #if defined(__WIZ__)
-	#ifdef	__CAANOO__
-		#define MENU_CPU_SPEED 			300
-	#else
-		#define MENU_CPU_SPEED 			120
-	#endif
+	#define MENU_CPU_SPEED 			120
 	#define MENU_FAST_CPU_SPEED		300
 #else
 	#define MENU_CPU_SPEED 			66
@@ -255,8 +247,8 @@ enum RENDER_MODE_ENUM
 #endif
 
 #if defined(__MIYOO__)
-#define INP_BUTTON_MENU_SELECT			INP_BUTTON_B
-#define INP_BUTTON_MENU_CANCEL			INP_BUTTON_X
+#define INP_BUTTON_MENU_SELECT			INP_BUTTON_A
+#define INP_BUTTON_MENU_CANCEL			INP_BUTTON_B
 #define INP_BUTTON_MENU_ENTER			INP_BUTTON_SELECT
 #define INP_BUTTON_MENU_DELETE			INP_BUTTON_SELECT
 #define INP_BUTTON_MENU_QUICKSAVE1		INP_BUTTON_R

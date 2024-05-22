@@ -10,20 +10,18 @@ extern "C" {
 #define SOUND_THREAD_PAUSE				3
 
 #define INP_BUTTON_UP				(0)
-#define INP_BUTTON_LEFT				(2)
-#define INP_BUTTON_DOWN				(4)
-#define INP_BUTTON_RIGHT			(6)
-#define INP_BUTTON_START			(8)
-#define INP_BUTTON_SELECT			(9)
-#define INP_BUTTON_L				(10)
-#define INP_BUTTON_R				(11)
-#define INP_BUTTON_A				(12)
-#define INP_BUTTON_B				(13)
-#define INP_BUTTON_X				(14)
-#define INP_BUTTON_Y				(15)
-#define INP_BUTTON_VOL_UP			(23)
-#define INP_BUTTON_VOL_DOWN			(22)
-#define INP_BUTTON_STICK_PUSH		(27)
+#define INP_BUTTON_LEFT				(1)
+#define INP_BUTTON_DOWN				(2)
+#define INP_BUTTON_RIGHT			(3)
+#define INP_BUTTON_START			(4)
+#define INP_BUTTON_SELECT			(5)
+#define INP_BUTTON_L				(6)
+#define INP_BUTTON_R				(7)
+#define INP_BUTTON_A				(8)
+#define INP_BUTTON_B				(9)
+#define INP_BUTTON_X				(10)
+#define INP_BUTTON_Y				(11)
+#define INP_BUTTON_HOME				(12)
 
 void gp_setClipping(int x1, int y1, int x2, int y2);
 void gp_drawString (int x,int y,int len,char *buffer,unsigned short color,void *framebuffer);

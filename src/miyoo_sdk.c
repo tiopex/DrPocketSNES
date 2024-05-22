@@ -303,9 +303,7 @@ unsigned int gp_getButton(unsigned char enable_diagnals)
 	if (keystate[SDLK_LCTRL]) ret |= 1<<INP_BUTTON_B;
 	if (keystate[SDLK_LSHIFT]) ret |= 1<<INP_BUTTON_X;
 	if (keystate[SDLK_SPACE]) ret |= 1<<INP_BUTTON_Y;
-
-	if (keystate[SDLK_RCTRL]) ret |= 1<<INP_BUTTON_VOL_UP;
-	if (keystate[SDLK_RCTRL]) ret |= 1<<INP_BUTTON_VOL_DOWN;
+	if (keystate[SDLK_RCTRL]) ret |= 1<<INP_BUTTON_HOME;
 
 	return ret;
 }
