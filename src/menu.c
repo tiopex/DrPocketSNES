@@ -191,15 +191,16 @@ void SnesDefaultMenuOptions(void)
 {
 	// no options file loaded, so set to defaults
 	snesMenuOptions.menuVer=SNES_OPTIONS_VER;
-	snesMenuOptions.frameSkip=1;
+	snesMenuOptions.frameSkip=0;
 	snesMenuOptions.soundOn = 1;
 	snesMenuOptions.stereo = 1;
 	snesMenuOptions.volume=100; 
 	memset(snesMenuOptions.padConfig,0xFF,sizeof(snesMenuOptions.padConfig));
-	snesMenuOptions.showFps=1;
+	snesMenuOptions.showFps=0;
+	snesMenuOptions.transparency=1;
 	snesMenuOptions.gamma=0;
 	snesMenuOptions.asmspc700=0;
-	snesMenuOptions.SpeedHacks=1;
+	snesMenuOptions.SpeedHacks=0;
 #if defined(__WIZ__)
 	snesMenuOptions.soundRate=0;
 	snesMenuOptions.cpuSpeed=8;
