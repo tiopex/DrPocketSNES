@@ -1676,10 +1676,10 @@ void SNESOptionsUpdateText(int menu_index)
 			switch(snesMenuOptions.asmspc700)
 			{
 				case 0:
-					sprintf(menutext[SNES_MENU_EMULATION_TYPE],"Emulation (Reset Required): Compatible");
+					sprintf(menutext[SNES_MENU_EMULATION_TYPE],"Emulation (Reset Required): S9xAPU");
 					break;
 				case 1:
-					sprintf(menutext[SNES_MENU_EMULATION_TYPE],"Emulation (Reset Required): Fast");
+					sprintf(menutext[SNES_MENU_EMULATION_TYPE],"Emulation (Reset Required): SPC700");
 					break;
 			}
 			break;
