@@ -257,9 +257,9 @@ enum RENDER_MODE_ENUM
 #define INP_BUTTON_MENU_QUICKLOAD2		INP_BUTTON_SELECT
 
 //Menu Text
-#define MENU_TEXT_LOAD_SAVESTATE 		"Press B to load"
-#define MENU_TEXT_OVERWRITE_SAVESTATE	"Press B to overwrite"
-#define MENU_TEXT_DELETE_SAVESTATE 		"Press B to delete"
+#define MENU_TEXT_LOAD_SAVESTATE 		"Press A to load"
+#define MENU_TEXT_OVERWRITE_SAVESTATE	"Press A to overwrite"
+#define MENU_TEXT_DELETE_SAVESTATE 		"Press A to delete"
 #define MENU_TEXT_PREVIEW_SAVESTATE 	"Press Y to preview"
 #endif
 
