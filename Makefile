@@ -46,12 +46,18 @@ clean:
 	rm -f $(PNAME)_compatible* $(PNAME)_fast*
 
 # when release is targeted compile both fast and compatible versions
-release: 
-	$(MAKE) $(DEFAULT)f
-	$(MAKE) $(DEFAULT)c
-	rm -f rel/*.gpe
-	cp $(PNAME)_$(DEFAULT)_*.gpe rel/.
-	zip $(PNAME)-$(FILE_DATE).zip rel/*
+release: comp
+	mkdir -p rel
+	cp MANUAL COPYRIGHT CHANGELOG rel/
+	mv rel/MANUAL rel/manual.man.txt
+	mv rel/COPYRIGHT rel/COPYRIGHT.txt
+	mv rel/CHANGELOG rel/CHANGELOG.txt
+	cp -r menu_header.bmp assets/* rel/
+	cp $(PNAME)_compatible rel/
+# only include fast build if present
+	-cp $(PNAME)_fast rel/
+	cd rel && zip -r ../$(PNAME)-$(FILE_DATE).zip .
+	rm -rf rel/
 
 # invoke stage 2
 do: STAGE = 2

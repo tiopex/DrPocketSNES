@@ -1,8 +1,23 @@
 ==============
 Change History
 ==============
+Version 7.2.2 for MiyooCFW, Release Date 22/05/2024 (again open-sourced!)
+___________________________________
+Changes by Apaczer & tiopex
+with help from Nurgo
 
-Version 7.2.1 v2 for PocketGo Release Date 13/12/2020  
+- Bringing changes from 7.2.1v2 to current open-source release, without prv issues thus:
+	- fix ALSA output (credits @tiopex)
+	- add basic FS bilinear upscaler from snes9x2002 codebase (Apaczer)
+	- include HZ upscaler from wiz_sdk.c (Apaczer)
+	- add argument reading for loading ROM file. (credits @tiopex)
+	- optimize output target (credits @tiopex)
+	- remove redundant settings options
+- Improving performance with newer gcc and PGO instructions
+- Coreccting button mapping in menu (inline with whole OS) (with Nurgo's help)
+
+___________________________________
+Version 7.2.1v2 for PocketGo, Release Date 13/12/2020  (closed-source release)
 ___________________________________
 Changes by Bitrider  
 Tons of help from A600 
@@ -17,7 +32,7 @@ On PocketGo it gives a nice boost but not so big (same arm 926 but faster memory
 
 This hack can cause some glitches (wrong colors, graphics errors), if you find any undesirable glitch deactivate it (you will loose some fps). 
 
-PocketGo release has been possible due to big help provided by A600: setting up QEMU emulator, tool chaind and sample code.
+PocketGo release has been possible due to big help provided by A600: setting up QEMU emulator, toolchain and sample code.
 
 Version 7.2.1 Release Date ??/??/2020  
 ___________________________________
