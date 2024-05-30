@@ -44,6 +44,7 @@ clean:
 	rm -f compatible_objs/*.o
 	rm -f fast_objs/*.o
 	rm -f $(PNAME)_compatible* $(PNAME)_fast*
+	-rm -rf rel/
 
 # when release is targeted compile both fast and compatible versions
 release: comp
@@ -56,8 +57,9 @@ release: comp
 	cp $(PNAME)_compatible rel/
 # only include fast build if present
 	-cp $(PNAME)_fast rel/
+
+zip: release
 	cd rel && zip -r ../$(PNAME)-$(FILE_DATE).zip .
-	rm -rf rel/
 
 # invoke stage 2
 do: STAGE = 2
