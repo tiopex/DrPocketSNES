@@ -45,36 +45,24 @@ Sound Rate
 	Allows you to configure the sample rate of the sound emulation.  The high the rate the clearer and more accurate the sound.
 _______________________________________________
 Volumne  
-	Allows you setup default volume levels.  Volume can also be controlled using the volume controls on the GP2X.
-_______________________________________________	
-Cpu Speed  
-	Allows you select the GP2X cpu speed to be used when emulating the Snes.  The higher the cpu speed the smoother the emulation is ( plus it drains you battery more)
+	Allows you setup default volume levels.  Volume can also be controlled using the volume controls on the MIYOO.
 _______________________________________________	
 FrameSkip  
 	Allows you to control how many frames are not rendered, this can allow you to keep full speed emulation when at low cpu speeds. AUTO will skip as many frames as needed in order to maintain full speed emulation.
 _______________________________________________	
 Action Buttons  
-	The GP2X has the same button as the snes but the buttons are in the wrong order.  This option allows you to have the same button names as the snes, or to have the same button positions as snes.
-	NORMAL = same button names as Snes
-	SWAPPED = same button positions as Snes
+	The MIYOO has the same buttons as the SNES controller ones.  This option allows you to swap B<->A and Y<->X buttons respectivly
+	NORMAL = same buttons as SNES
+	SWAPPED = swapped action buttons B is A & Y is X (and vice-versa)
 _______________________________________________	
 Show FPS  
 	This allows you to see how man frames are being rendered per second.  This can allow you to see how the emulator is performing.
-_______________________________________________	
-Brightness  
-	This allows you to control the current brightness of the screen.  You can make it darker or brighter.
 _______________________________________________	
 Transparencies  
 	The SNES has very complicated graphics hardware which can be quite slow to emulate.  Switching off transparencies can improve performce but makes some games unplayable because you can not see all of the information that you need.
 _______________________________________________	
 Render Mode  
-	Allows you to scale the emulated SNES graphics.  The normal SNES screen resolution is less than the GP2X's, so when in unscaled mode the graphics appear in a window.  If you select the scaled mode then the graphics are stretched to fill the screen.
-_______________________________________________	
-RAM Timing  
-	This allows you select faster ram timings.  This can improve performance.  If you change this option you need to restart PocketSnes because these settings are only applied as the emulator is first started.
-_______________________________________________	
-MMU Hack  
-	This option allows you to enable the MMU hack developed by Squidge.  This option massively improves performance and is recommended.  Again if you change this option you need to restart PocketSnes because these settings are only applied as the emulator is first started.
+	Allows you to scale the emulated SNES graphics.  The normal SNES screen resolution is less than the MIYOO's, so when in unscaled mode the graphics appear in a window.  If you select the scaled mode then the graphics are stretched to fill the screen.
 _______________________________________________	
 Saving SRAM  
 	This option allows you to control how the SRAM is saved to you SD card.  If you select automatic then SRAM will be saved automatically everytime you return to the menu if it has been modified during the last run of emulation.  If you select the manual option then SRAM will only be saved when you select the Save SRAM menu option from the main menu.
