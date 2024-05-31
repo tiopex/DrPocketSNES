@@ -45,6 +45,7 @@ clean:
 	rm -f fast_objs/*.o
 	rm -f $(PNAME)_compatible* $(PNAME)_fast*
 	-rm -rf rel/
+	-rm -f $(PNAME)
 
 # when release is targeted compile both fast and compatible versions
 release: comp
@@ -60,6 +61,10 @@ release: comp
 
 zip: release
 	cd rel && zip -r ../$(PNAME)-$(FILE_DATE).zip .
+
+ipk:
+	cp $(PNAME)_compatible $(PNAME)
+	gm2xpkg --ipk pkg.cfg
 
 # invoke stage 2
 do: STAGE = 2
@@ -117,7 +122,7 @@ LIBS += -lgcov
 else ifeq ($(PROFILE), APPLY)
 CFLAGS	+= -fprofile-use=profile -fbranch-probabilities
 else
-CFLAGS	+= -fno-guess-branch-probability
+CFLAGS	+= -fno-guess-branch-probability -flto
 endif
 
 # Inopia's menu system, hacked for the GP2X under rlyeh's sdk
