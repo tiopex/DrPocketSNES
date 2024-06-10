@@ -15,21 +15,6 @@
 #include <alsa/asoundlib.h>
 #include <time.h>
 
-// SNES9X2002 scaler macros:
-#define AVERAGE(z, x) ((((z) & 0xF7DEF7DE) >> 1) + (((x) & 0xF7DEF7DE) >> 1))
-#define AVERAGEHI(AB) ((((AB) & 0xF7DE0000) >> 1) + (((AB) & 0xF7DE) << 15))
-#define AVERAGELO(CD) ((((CD) & 0xF7DE) >> 1) + (((CD) & 0xF7DE0000) >> 17))
-#define Half(A) (((A) >> 1) & 0x7BEF)
-#define Quarter(A) (((A) >> 2) & 0x39E7)
-#define RestHalf(A) ((A) & 0x0821)
-#define RestQuarter(A) ((A) & 0x1863)
-#define Corr1_3(A, B)     Quarter(RestQuarter(A) + (RestHalf(B) << 1) + RestQuarter(B))
-#define Corr3_1(A, B)     Quarter((RestHalf(A) << 1) + RestQuarter(A) + RestQuarter(B))
-#define Corr1_1(A, B)     ((A) & (B) & 0x0821)
-#define Weight1_3(A, B)   (Quarter(A) + Half(B) + Quarter(B) + Corr1_3(A, B))
-#define Weight3_1(A, B)   (Half(A) + Quarter(A) + Quarter(B) + Corr3_1(A, B))
-#define Weight1_1(A, B)   (Half(A) + Half(B) + Corr1_1(A, B))
-
 static snd_pcm_t *handle;
 
 volatile unsigned short  gp2x_palette[512][2];
@@ -646,74 +631,320 @@ void gp_Reset(void)
 
 }
 
+// SNES9X2002 scaler macros:
+#define AVERAGE(z, x) ((((z) & 0xF7DEF7DE) >> 1) + (((x) & 0xF7DEF7DE) >> 1))
+#define AVERAGEHI(AB) ((((AB) & 0xF7DE0000) >> 1) + (((AB) & 0xF7DE) << 15))
+#define AVERAGELO(CD) ((((CD) & 0xF7DE) >> 1) + (((CD) & 0xF7DE0000) >> 17))
+#define Half(A) (((A) >> 1) & 0x7BEF)
+#define Quarter(A) (((A) >> 2) & 0x39E7)
+#define RestHalf(A) ((A) & 0x0821)
+#define RestQuarter(A) ((A) & 0x1863)
+#define Corr1_3(A, B)     Quarter(RestQuarter(A) + (RestHalf(B) << 1) + RestQuarter(B))
+#define Corr3_1(A, B)     Quarter((RestHalf(A) << 1) + RestQuarter(A) + RestQuarter(B))
+#define Corr1_1(A, B)     ((A) & (B) & 0x0821)
+#define Weight1_3(A, B)   (Quarter(A) + Half(B) + Quarter(B) + Corr1_3(A, B))
+#define Weight3_1(A, B)   (Half(A) + Quarter(A) + Quarter(B) + Corr3_1(A, B))
+#define Weight1_1(A, B)   (Half(A) + Half(B) + Corr1_1(A, B))
+
+// Old scaling macro
+#define COLORMIX(a, b) ( ((((a & 0xF81F) + (b & 0xF81F)) >> 1) & 0xF81F) | ((((a & 0x07E0) + (b & 0x07E0)) >> 1) & 0x07E0) )
+
+// Line scaling macros
+#define ScaleLineFast(Target, Source, x) \
+	do { \
+		uint16_t* target = Target; \
+		uint16_t* source = Source; \
+		unsigned short w = x; \
+		while (w != 0) { \
+			target[0] = source[0]; \
+			target[1] = source[1]; \
+			target[2] = source[2]; \
+			target[3] = Weight1_1(source[2], source[3]); \
+			target[4] = source[3]; \
+			target += 5; \
+			source += 4; \
+			w--; \
+		} \
+	} while (0)
+
+#define ScaleLineSlow(Target, Source, x) \
+	do { \
+		uint16_t* target = Target; \
+		uint16_t* source = Source; \
+		unsigned short w = x; \
+		while (w != 0) { \
+			uint16_t _1 = source[0]; \
+			target[0] = _1; \
+			uint16_t _2 = source[1]; \
+			target[1] = Weight1_3(_1, _2); \
+			uint16_t _3 = source[2]; \
+			target[2] = Weight1_1(_2, _3); \
+			uint16_t _4 = source[3]; \
+			target[3] = Weight3_1(_3, _4); \
+			target[4] = _4; \
+			target += 5; \
+			source += 4; \
+			w--; \
+		} \
+	} while (0)
+
+// Line interpolation macros
+#define InterpolateLines_1_1(Target, SourceA, SourceB, x) \
+	do { \
+		uint16_t* target = Target; \
+		uint16_t* sourceA = SourceA; \
+		uint16_t* sourceB = SourceB; \
+		unsigned short w = x; \
+		while (w != 0) { \
+			(target)[0] = Weight1_1((sourceA)[0], (sourceB)[0]); \
+			(target)[1] = Weight1_1((sourceA)[1], (sourceB)[1]); \
+			(target)[2] = Weight1_1((sourceA)[2], (sourceB)[2]); \
+			(target)[3] = Weight1_1((sourceA)[3], (sourceB)[3]); \
+			(target)[4] = Weight1_1((sourceA)[4], (sourceB)[4]); \
+			(target) += 5; \
+			(sourceA) += 5; \
+			(sourceB) += 5; \
+			w--; \
+		} \
+	} while (0)
+
+#define InterpolateLines_1_3(Target, SourceA, SourceB, x) \
+	do { \
+		uint16_t* target = Target; \
+		uint16_t* sourceA = SourceA; \
+		uint16_t* sourceB = SourceB; \
+		unsigned short w = x; \
+		while (w != 0) { \
+			(target)[0] = Weight1_3((sourceA)[0], (sourceB)[0]); \
+			(target)[1] = Weight1_3((sourceA)[1], (sourceB)[1]); \
+			(target)[2] = Weight1_3((sourceA)[2], (sourceB)[2]); \
+			(target)[3] = Weight1_3((sourceA)[3], (sourceB)[3]); \
+			(target)[4] = Weight1_3((sourceA)[4], (sourceB)[4]); \
+			(target) += 5; \
+			(sourceA) += 5; \
+			(sourceB) += 5; \
+			w--; \
+		} \
+	} while (0)
+
+#define InterpolateLines_3_1(Target, SourceA, SourceB, x) \
+	do { \
+		uint16_t* target = Target; \
+		uint16_t* sourceA = SourceA; \
+		uint16_t* sourceB = SourceB; \
+		unsigned short w = x; \
+		while (w != 0) { \
+			(target)[0] = Weight3_1((sourceA)[0], (sourceB)[0]); \
+			(target)[1] = Weight3_1((sourceA)[1], (sourceB)[1]); \
+			(target)[2] = Weight3_1((sourceA)[2], (sourceB)[2]); \
+			(target)[3] = Weight3_1((sourceA)[3], (sourceB)[3]); \
+			(target)[4] = Weight3_1((sourceA)[4], (sourceB)[4]); \
+			(target) += 5; \
+			(sourceA) += 5; \
+			(sourceB) += 5; \
+			w--; \
+		} \
+	} while (0)
+
 void gp_video_RGB_setscaling(int W, int H)
 {
 	uint16_t * pSource = (uint16_t *)pOutputScreen;
 	uint16_t * pTarget = (uint16_t *)framebuffer16[currFB];
-	unsigned short y;
-	unsigned short x;
-	if (H == 239)
-	{
-		for (y = 240; y != 0; y--)
-		{
-			pSource+=32;
-			for (x = 64; x != 0; x--)
-			{
-				uint16_t _1 = pSource[0];
-				pTarget[0] = _1;
-				uint16_t _2 = pSource[1];
-				pTarget[1] = Weight1_3( _1, _2);
-				uint16_t _3 = pSource[2];
-				pTarget[2] = Weight1_1( _2, _3);
-				uint16_t _4 = pSource[3];
-				pTarget[3] = Weight3_1( _3, _4);
-				pTarget[4] = _4;
-				pTarget+=5;
-				pSource+=4;		
-			}
-			pSource+=32;
-		}
-	}
-	else // 224
+	unsigned short y, x;
+	if (H == 224)
 	{
 		pSource += 2560;
-		unsigned short pos = 2;
-		for (y = 240; y != 0; y--)
-		{
-			pSource+=32;
-			for (x = 64; x != 0; x--)
-			{
-				uint16_t _1 = pSource[0];
-				pTarget[0] = _1;
-				uint16_t _2 = pSource[1];
-				pTarget[1] = Weight1_3( _1, _2);
-				uint16_t _3 = pSource[2];
-				pTarget[2] = Weight1_1( _2, _3);
-				uint16_t _4 = pSource[3];
-				pTarget[3] = Weight3_1( _3, _4);
-				pTarget[4] = _4;
-				pTarget+=5;
-				pSource+=4;		
-			}
-			pSource+=32;
-			pos--;
+		uint16_t l1[320];
+		uint16_t l2[320];
+		uint16_t* l3;
 
-			if (pos == 0)
-			{
-				pSource -= 320;
-				pos = 14;
-			}
+		for (y = 0; y < 16; y++)
+		{
+			x = 64;
+			// Direct copy
+			pSource += 32;
+			ScaleLineSlow(pTarget, pSource, x);
+			pSource += 256 + 64;
+			pTarget += 320;
+
+			ScaleLineSlow(pTarget, pSource, x);
+			pSource += 256 + 64;
+			pTarget += 320;
+
+			ScaleLineSlow(pTarget, pSource, x);
+			l3 = pTarget;
+			pSource += 256 + 64;
+			pTarget += 320;
+
+			// Interpolate 1/3
+			ScaleLineSlow(l2, pSource, x);
+			InterpolateLines_1_3(pTarget, l3, l2, x);
+			pSource += 256 + 64;
+			pTarget += 320;
+
+			ScaleLineSlow(l1, pSource, x);
+			InterpolateLines_1_3(pTarget, l2, l1, x);
+			pSource += 256 + 64;
+			pTarget += 320;
+
+			ScaleLineSlow(l2, pSource, x);
+			InterpolateLines_1_3(pTarget, l1, l2, x);
+			pSource += 256 + 64;
+			pTarget += 320;
+
+			// Interpolate 1/1
+			ScaleLineSlow(l1, pSource, x);
+			InterpolateLines_1_1(pTarget, l2, l1, x);
+			pSource += 256 + 64;
+			pTarget += 320;
+
+			ScaleLineSlow(l2, pSource, x);
+			InterpolateLines_1_1(pTarget, l1, l2, x);
+			pSource += 256 + 64;
+			pTarget += 320;
+
+			ScaleLineSlow(l1, pSource, x);
+			InterpolateLines_1_1(pTarget, l2, l1, x);
+			pSource += 256 + 64;
+			pTarget += 320;
+
+			// Interpolate 3/1
+			ScaleLineSlow(l2, pSource, x);
+			InterpolateLines_3_1(pTarget, l1, l2, x);
+			pSource += 256 + 64;
+			pTarget += 320;
+
+			ScaleLineSlow(l1, pSource, x);
+			InterpolateLines_3_1(pTarget, l2, l1, x);
+			pSource += 256 + 64;
+			pTarget += 320;
+
+			l3 = pTarget + 320;
+			ScaleLineSlow(l3, pSource, x);
+			InterpolateLines_3_1(pTarget, l1, l3, x);
+			pSource += 256 + 64;
+			pTarget += 320;
+
+			// Direct copy
+			pTarget += 320;
+
+			ScaleLineSlow(pTarget, pSource, x);
+			pSource += 256 + 64;
+			pTarget += 320;
+
+			ScaleLineSlow(pTarget, pSource, x);
+			pSource += 256 + 32;
+			pTarget += 320;
+		}
+	}
+	else // H == 239
+	{
+		for (y = H; y != 0; y--)
+		{
+			x = 64;
+			pSource += 32;
+			ScaleLineSlow(pTarget, pSource, x);
+			pSource += 256 + 32;
+			pTarget += 320;
 		}
 	}
 }
 
-#define COLORMIX(a, b) ( ((((a & 0xF81F) + (b & 0xF81F)) >> 1) & 0xF81F) | ((((a & 0x07E0) + (b & 0x07E0)) >> 1) & 0x07E0) )
+void gp_video_RGB_setscaling_fast(int W, int H)
+{
+	uint16_t * pSource = (uint16_t *)pOutputScreen;
+	uint16_t * pTarget = (uint16_t *)framebuffer16[currFB];
+	unsigned short y, x;
+	if (H == 224)
+	{
+		pSource += 2560;
+
+		for (y = 0; y < 16; y++)
+		{
+			x = 64;
+			pSource += 32;
+
+			ScaleLineSlow(pTarget, pSource, x);
+			pSource += 256 + 64;
+			pTarget += 320;
+
+			ScaleLineSlow(pTarget, pSource, x);
+			pSource += 256 + 64;
+			pTarget += 320;
+
+			ScaleLineSlow(pTarget, pSource, x);
+			pSource += 256 + 64;
+			pTarget += 320;
+
+			ScaleLineSlow(pTarget, pSource, x);
+			pSource += 256 + 64;
+			pTarget += 320;
+
+			ScaleLineSlow(pTarget, pSource, x);
+			pSource += 256 + 64;
+			pTarget += 320;
+
+			ScaleLineSlow(pTarget, pSource, x);
+			pSource += 256 + 64;
+			pTarget += 320;
+
+			ScaleLineSlow(pTarget, pSource, x);
+			pSource += 256 + 64;
+			pTarget += 320;
+
+			ScaleLineSlow(pTarget, pSource, x);
+			pSource += 256 + 64;
+			pTarget += 320;
+
+			ScaleLineSlow(pTarget, pSource, x);
+			pSource += 256 + 64;
+			pTarget += 320;
+
+			ScaleLineSlow(pTarget, pSource, x);
+			pSource += 256 + 64;
+			pTarget += 320;
+
+			ScaleLineSlow(pTarget, pSource, x);
+			pSource += 256 + 64;
+			pTarget += 320;
+
+			ScaleLineSlow(pTarget, pSource, x);
+			pSource += 256 + 64;
+			pTarget += 320;
+
+			// Skip a line
+			pTarget += 320;
+
+			ScaleLineSlow(pTarget, pSource, x);
+			
+			// Interpolate the skipped line
+			InterpolateLines_1_1(pTarget - 320, pTarget - 640, pTarget, x);
+			pSource += 256 + 64;
+			pTarget += 320;
+
+			ScaleLineSlow(pTarget, pSource, x);
+			pSource += 256 + 32;
+			pTarget += 320;
+		}
+	}
+	else // H == 239
+	{
+		for (y = H; y != 0; y--)
+		{
+			x = 64;
+			pSource += 32;
+			ScaleLineFast(pTarget, pSource, x);
+			pSource += 256 + 32;
+			pTarget += 320;
+		}
+	}
+}
+
 void gp_video_RGB_setHZscaling(int W, int H)
 {
 	uint16_t * pSource = (uint16_t *)pOutputScreen;
 	uint16_t * pTarget = (uint16_t *)framebuffer16[currFB];
-	unsigned short y;
-	unsigned short x;
+	unsigned short y, x;
 
 	if (H == 224)
 	{
@@ -721,19 +952,33 @@ void gp_video_RGB_setHZscaling(int W, int H)
 		pTarget += 2560;
 	}
 	for (y = H; y != 0; y--)
+	{ // 239 || 224
+		x = 64;
+		pSource += 32;
+		ScaleLineSlow(pTarget,pSource, x);
+		pSource += 256 + 32;
+		pTarget += 320;
+	}
+}
+
+void gp_video_RGB_setHZscaling_fast(int W, int H)
+{
+	uint16_t * pSource = (uint16_t *)pOutputScreen;
+	uint16_t * pTarget = (uint16_t *)framebuffer16[currFB];
+	unsigned short y, x;
+
+	if (H == 224)
 	{
-		pSource+=32;
-		for (x = 64; x != 0; x--)
-		{
-			pTarget[0] = pSource[0];
-			pTarget[1] = pSource[1];
-			pTarget[2] = pSource[2];
-			pTarget[3] = COLORMIX(pSource[2],pSource[3]);
-			pTarget[4] = pSource[3];
-			pTarget+=5;
-			pSource+=4;		
-		}
-		pSource+=32;
+		pSource += 2560;
+		pTarget += 2560;
+	}
+	for (y = H; y != 0; y--)
+	{ // 239 || 224
+		x = 64;
+		pSource += 32;
+		ScaleLineFast(pTarget,pSource, x);
+		pSource += 256 + 32;
+		pTarget += 320;
 	}
 }
 

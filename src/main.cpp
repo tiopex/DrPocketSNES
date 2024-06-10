@@ -366,6 +366,18 @@ extern "C"
 			oldHeight=Height;
 		}
 #endif
+#if defined(__MIYOO__)
+		else if ( snesMenuOptions.renderMode == RENDER_MODE_SCALED_FAST)
+		{
+			gp_video_RGB_setscaling_fast(256,Height);
+			oldHeight=Height;
+		}
+		else if ( snesMenuOptions.renderMode == RENDER_MODE_HORIZONTAL_SCALED_FAST)
+		{
+			gp_video_RGB_setHZscaling_fast(256,Height);
+			oldHeight=Height;
+		}
+#endif
 
 
 		if ((CPU.SRAMModified) && (snesMenuOptions.autoSram == 2)) Draw16x16Image(framebuffer16[currFB], 320-16, 240-16, disk_img);
