@@ -45,7 +45,7 @@ clean:
 	rm -f fast_objs/*.o
 	rm -f $(PNAME)_compatible* $(PNAME)_fast*
 	-rm -rf rel/
-	-rm -f $(PNAME)
+	-rm -f $(PNAME) $(PNAME).ipk
 
 # when release is targeted compile both fast and compatible versions
 release: comp
@@ -122,7 +122,7 @@ LIBS += -lgcov
 else ifeq ($(PROFILE), APPLY)
 CFLAGS	+= -fprofile-use=profile -fbranch-probabilities
 else
-CFLAGS	+= -fno-guess-branch-probability -flto
+CFLAGS	+= -fno-guess-branch-probability
 endif
 
 # Inopia's menu system, hacked for the GP2X under rlyeh's sdk
