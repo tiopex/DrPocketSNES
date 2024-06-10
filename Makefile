@@ -55,6 +55,7 @@ release: comp
 	mv rel/COPYRIGHT rel/COPYRIGHT.txt
 	mv rel/CHANGELOG rel/CHANGELOG.txt
 	cp -r menu_header.bmp assets/* rel/
+	cp icon.png rel/$(PNAME).png
 	cp $(PNAME)_compatible rel/
 # only include fast build if present
 	-cp $(PNAME)_fast rel/
@@ -63,6 +64,7 @@ zip: release
 	cd rel && zip -r ../$(PNAME)-$(FILE_DATE).zip .
 
 ipk:
+	cp icon.png assets/$(PNAME).png
 	cp $(PNAME)_compatible $(PNAME)
 	gm2xpkg --ipk pkg.cfg
 
