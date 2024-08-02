@@ -1,6 +1,18 @@
 ==============
 Change History
 ==============
+Version 7.2.3 for MiyooCFW, Release Date 02/08/2024
+___________________________________
+Changes by Nurgo & tiopex
+with help from Apaczer
+
+- optimize video ouput
+- menu: simplify scalers names & reorder
+- new scalers:
+	- fullscreen/horrizontal (fast) => with "nearest" pixel mixing
+	- fullscreen/horrizontal smooth => with bilinear/linear interpolation
+
+___________________________________
 Version 7.2.2 for MiyooCFW, Release Date 22/05/2024 (again open-sourced!)
 ___________________________________
 Changes by Apaczer & tiopex
@@ -34,6 +46,7 @@ This hack can cause some glitches (wrong colors, graphics errors), if you find a
 
 PocketGo release has been possible due to big help provided by A600: setting up QEMU emulator, toolchain and sample code.
 
+___________________________________
 Version 7.2.1 Release Date ??/??/2020  
 ___________________________________
 

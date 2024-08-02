@@ -45,6 +45,7 @@ clean:
 	rm -f fast_objs/*.o
 	rm -f $(PNAME)_compatible* $(PNAME)_fast*
 	-rm -rf rel/
+	-gm2xpkg --clean pkg.cfg
 	-rm -f $(PNAME) $(PNAME).ipk
 
 # when release is targeted compile both fast and compatible versions
@@ -63,7 +64,7 @@ release: comp
 zip: release
 	cd rel && zip -r ../$(PNAME)-$(FILE_DATE).zip .
 
-ipk:
+ipk: comp
 	cp icon.png assets/$(PNAME).png
 	cp $(PNAME)_compatible $(PNAME)
 	gm2xpkg --ipk pkg.cfg

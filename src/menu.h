@@ -56,7 +56,7 @@ extern "C" {
 #define SAVESTATE_MODE_DELETE			2
 
 #define SNES_OPTIONS_VER 			1
-#define PSVER	"7.2.2"
+#define PSVER	"7.2.3"
 #ifdef ASMCPU
 	#define DRSNES_VERSION				"v " PSVER " fast"
 #else

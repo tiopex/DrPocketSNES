@@ -1,5 +1,4 @@
 opkg_assets/
-*.gcda
 *.o
 pocketsnes*
 drpocketsnes*
